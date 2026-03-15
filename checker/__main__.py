@@ -168,7 +168,7 @@ def _build_issue(
         for dep in item["deprecated_fields"]:
             problems.append(f"`{dep}` — deprecated field")
     for item in issues_removed:
-        problems.append(f"`{item['url']}` — not in current spec (likely removed)")
+        problems.append(f"`{item['url']}`")
 
     short = problems[0][:80] if problems else "breaking changes detected"
     title = f"[DriftaBot] Breaking change in {display} API: {short}"
@@ -190,7 +190,7 @@ def _build_issue(
 
     removed_section = ""
     for item in issues_removed:
-        removed_section += f"- `{item['url']}` — not in current spec (likely removed)\n"
+        removed_section += f"- `{item['url']}`\n"
 
     changes_md = ""
     if deprecated_section:

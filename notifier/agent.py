@@ -28,6 +28,7 @@ Process all repos sequentially to respect Code Search rate limits.
 
 ## Important rules
 - Process ALL companies, even if some fail — never abort early.
+- Stop after checking 20 repos total across all companies and phases. Print a note if the cap is reached.
 - Never include spec file contents in any message or tool call.
 - Be terse. Do not narrate your reasoning, re-read results, or second-guess tool outputs.
   Trust tool results on first read and proceed immediately.

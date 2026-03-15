@@ -1,0 +1,84 @@
+companies:
+  - name: stripe
+    display_name: Stripe
+    specs:
+      - type: openapi
+        repo: stripe/openapi
+        path: openapi/spec3.json
+        output: companies/stripe/openapi/stripe.openapi.json
+
+  - name: twilio
+    display_name: Twilio
+    specs:
+      - type: openapi
+        repo: twilio/twilio-oai
+        # Fetch all JSON spec files in the directory
+        path_pattern: spec/json
+        output_dir: companies/twilio/openapi/
+
+  - name: github
+    display_name: GitHub
+    specs:
+      - type: openapi
+        repo: github/rest-api-description
+        path: descriptions/api.github.com/api.github.com.json
+        output: companies/github/openapi/github.openapi.json
+
+  - name: slack
+    display_name: Slack
+    specs:
+      - type: openapi
+        repo: slackapi/slack-api-specs
+        path: web-api/slack_web_openapi_v2.json
+        output: companies/slack/openapi/slack.openapi.json
+
+  - name: sendgrid
+    display_name: SendGrid
+    specs:
+      - type: openapi
+        repo: sendgrid/sendgrid-oai
+        path: oas_v3.json
+        output: companies/sendgrid/openapi/sendgrid.openapi.json
+
+  - name: digitalocean
+    display_name: DigitalOcean
+    specs:
+      - type: openapi
+        repo: digitalocean/openapi
+        path: specification/DigitalOcean-public.v2.yaml
+        output: companies/digitalocean/openapi/digitalocean.openapi.yaml
+
+  - name: netlify
+    display_name: Netlify
+    specs:
+      - type: openapi
+        repo: netlify/open-api
+        path: swagger.yml
+        output: companies/netlify/openapi/netlify.openapi.yaml
+
+  - name: pagerduty
+    display_name: PagerDuty
+    specs:
+      - type: openapi
+        repo: PagerDuty/api-schema
+        path: REST/openapiv3.json
+        output: companies/pagerduty/openapi/pagerduty.openapi.json
+
+  - name: shopify
+    display_name: Shopify
+    specs:
+      - type: graphql
+        repo: Shopify/graphql-design-tutorial
+        # NOTE: Shopify's production GraphQL SDL is not publicly committed to GitHub.
+        # This entry is a placeholder; update path once a canonical SDL source is confirmed.
+        path: README.md
+        output: companies/shopify/graphql/.keep
+
+  - name: google
+    display_name: Google
+    specs:
+      - type: grpc
+        repo: googleapis/googleapis
+        # Fetch all proto files for the Pub/Sub v1 API as an example
+        path_pattern: google/pubsub/v1
+        output_dir: companies/google/grpc/pubsub_v1/

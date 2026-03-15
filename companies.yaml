@@ -36,9 +36,9 @@ companies:
     display_name: SendGrid
     specs:
       - type: openapi
-        repo: sendgrid/sendgrid-oai
-        path: oas_v3.json
-        output: companies/sendgrid/openapi/sendgrid.openapi.json
+        repo: twilio/sendgrid-oai
+        path_pattern: spec/json
+        output_dir: companies/sendgrid/openapi/
 
   - name: digitalocean
     display_name: DigitalOcean

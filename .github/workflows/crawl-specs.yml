@@ -25,10 +25,22 @@ jobs:
       - name: Install dependencies
         run: pip install -e .
 
+      - name: Determine run mode
+        id: mode
+        run: |
+          # Use the LangGraph agent once per day (at midnight UTC); all other
+          # runs use the fast deterministic crawler to save Anthropic API costs.
+          HOUR=$(date -u +%H)
+          if [ "$HOUR" = "00" ]; then
+            echo "use_agent=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "use_agent=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Run crawler agent
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ steps.mode.outputs.use_agent == 'true' && secrets.ANTHROPIC_API_KEY || '' }}
         run: python -m crawler
 
       - name: Commit updated specs

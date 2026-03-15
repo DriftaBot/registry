@@ -10,6 +10,7 @@ import re
 import subprocess
 import tempfile
 import time
+from datetime import datetime
 from pathlib import Path
 from typing import Annotated, Any
 
@@ -127,6 +128,32 @@ def get_changed_specs_plain() -> list[dict]:
     return changed
 
 
+def _write_drift_result(
+    company: str,
+    spec_type: str,
+    spec_path: str,
+    summary: dict,
+    changes: list[dict],
+) -> None:
+    """
+    Write drift detection result to companies/providers/<company>/drift/result_<spec_type>_<datetime>.json.
+    Files sort newest-first when listed in reverse alphabetical order.
+    """
+    drift_dir = REPO_ROOT / "companies" / "providers" / company / "drift"
+    drift_dir.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    result_path = drift_dir / f"result_{spec_type}_{timestamp}.json"
+    payload = {
+        "detected_at": datetime.now().isoformat(timespec="seconds"),
+        "company": company,
+        "spec_type": spec_type,
+        "spec_path": spec_path,
+        "summary": summary,
+        "changes": changes,
+    }
+    result_path.write_text(json.dumps(payload, indent=2))
+
+
 def detect_breaking_changes_plain(company: str, spec_type: str, changed_path: str) -> dict:
     """
     Compare old vs new version of a spec using the driftabot engine CLI.
@@ -167,7 +194,7 @@ def detect_breaking_changes_plain(company: str, spec_type: str, changed_path: st
                     "breaking_changes": [], "error": f"Engine error (exit {proc.returncode}): {proc.stderr[:300]}"}
 
         diff = json.loads(proc.stdout)
-        breaking = [
+        all_changes = [
             {
                 "type": c.get("type", ""),
                 "severity": c.get("severity", ""),
@@ -177,8 +204,15 @@ def detect_breaking_changes_plain(company: str, spec_type: str, changed_path: st
                 "description": c.get("description", ""),
             }
             for c in diff.get("changes", [])
-            if c.get("severity") == "breaking"
         ]
+        # Sort: breaking first, then non_breaking, then info
+        _sev_order = {"breaking": 0, "non_breaking": 1, "info": 2}
+        all_changes.sort(key=lambda c: _sev_order.get(c["severity"], 9))
+        breaking = [c for c in all_changes if c["severity"] == "breaking"]
+
+        # Write drift result file
+        _write_drift_result(company, spec_type, changed_path, diff.get("summary", {}), all_changes)
+
         return {
             "company": company,
             "spec_path": changed_path,

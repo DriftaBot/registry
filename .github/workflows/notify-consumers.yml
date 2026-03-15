@@ -4,11 +4,12 @@ on:
   push:
     branches: [main]
     paths:
-      - 'companies/**'    # only run when spec files are updated
+      - 'companies/**'
+      - '!companies/providers/*/drift/**'   # ignore drift result commits (avoid loop)
   workflow_dispatch:       # manual trigger for testing
 
 permissions:
-  contents: read           # read specs and git history only
+  contents: write          # write drift result files back to repo
 
 env:
   DRIFTABOT_ENGINE_VERSION: "6.0.5"
@@ -47,3 +48,11 @@ jobs:
           DRIFTABOT_TOKEN: ${{ secrets.DRIFTABOT_TOKEN }}
           DRIFTABOT_ENGINE_PATH: driftabot
         run: python -m notifier
+
+      - name: Commit drift results
+        run: |
+          git config user.name  "driftabot-agent"
+          git config user.email "driftabot-agent@users.noreply.github.com"
+          git add companies/providers/*/drift/
+          git diff --cached --quiet && echo "No drift results to commit." || \
+            git commit -m "chore: log drift detection results [skip ci]" && git push

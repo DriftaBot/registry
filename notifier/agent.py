@@ -42,29 +42,35 @@ those APIs by creating clear, actionable GitHub issues.
 ## Issue body template
 
 ```
-## Breaking API Change Detected — <Company> <spec_type> API
+## Breaking API Change — <Company> API
 
-Hi! DriftaBot detected a breaking change in the **<Company>** API that may affect this repository.
+**DriftaBot** detected a breaking change in the **<Company>** API that may affect this repository.
 
 ### What changed
 **<description>**
 
-- **Type:** `<type>`
-- **Path:** `<path>` `<method>`
-- **Location:** `<location>`
-- **Severity:** Breaking
+| | |
+|---|---|
+| **Type** | `<type>` |
+| **Path** | `<path>` `<method>` |
+| **Location** | `<location>` |
+| **Severity** | Breaking |
 
-### Affected files in this repo
-<bullet list of matched_files from check_consumer_usage>
+**Spec:** [<spec_path>](https://github.com/DriftaBot/specs/blob/<commit_sha>/<spec_path>)
 
-### Recommended action
-Please review the files above and update any references to the changed endpoint or field.
-See the <Company> API changelog for migration guidance.
+### Files referencing this endpoint
+<bullet list of matched_files from check_consumer_usage, or "_(no specific files identified)_">
+
+### Next steps
+1. Review the files listed above and update any references to the changed endpoint or field.
+2. Check the <Company> API changelog for migration guidance.
 
 ---
-*This issue was automatically created by [DriftaBot](https://github.com/DriftaBot/specs).
-If this is a false positive, please close the issue.*
+*Created by [DriftaBot](https://github.com/DriftaBot/specs) · If this is a false positive, close the issue.*
 ```
+
+Use `commit_sha` and `path` from the `get_changed_specs` result to build the spec link.
+Omit the Spec line if `commit_sha` is empty.
 
 ## Important rules
 - Process ALL companies with breaking changes, even if some fail — never abort early.

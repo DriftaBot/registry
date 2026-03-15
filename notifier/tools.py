@@ -95,6 +95,14 @@ def get_changed_specs_plain() -> list[dict]:
     if result.returncode != 0:
         return []
 
+    sha_result = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=str(REPO_ROOT),
+        capture_output=True,
+        text=True,
+    )
+    commit_sha = sha_result.stdout.strip() if sha_result.returncode == 0 else ""
+
     registry = load_registry()
     company_map = {c.name: c for c in registry.companies}
 
@@ -114,6 +122,7 @@ def get_changed_specs_plain() -> list[dict]:
             "company": company_name,
             "spec_type": spec_type,
             "display_name": display,
+            "commit_sha": commit_sha,
         })
     return changed
 

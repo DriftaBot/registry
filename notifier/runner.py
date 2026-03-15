@@ -24,30 +24,39 @@ def _issue_body(
     spec_type: str,
     bc: dict,
     matched_files: list[str],
+    spec_path: str = "",
+    commit_sha: str = "",
 ) -> str:
     files_md = "\n".join(f"- `{f}`" for f in matched_files) or "_(no specific files identified)_"
-    return f"""## Breaking API Change Detected — {display_name} {spec_type} API
+    spec_link = ""
+    if spec_path and commit_sha:
+        url = f"https://github.com/DriftaBot/specs/blob/{commit_sha}/{spec_path}"
+        spec_link = f"\n**Spec:** [{spec_path}]({url})\n"
+    method = bc.get('method', '')
+    path_str = f"`{bc.get('path', '')}`" + (f" `{method}`" if method else "")
+    return f"""## Breaking API Change — {display_name} API
 
-Hi! DriftaBot detected a breaking change in the **{display_name}** API that may affect this repository.
+**DriftaBot** detected a breaking change in the **{display_name}** API that may affect this repository.
 
 ### What changed
 **{bc['description']}**
 
-- **Type:** `{bc['type']}`
-- **Path:** `{bc.get('path', '')}` `{bc.get('method', '')}`
-- **Location:** `{bc.get('location', '')}`
-- **Severity:** Breaking
-
-### Affected files in this repo
+| | |
+|---|---|
+| **Type** | `{bc['type']}` |
+| **Path** | {path_str} |
+| **Location** | `{bc.get('location', '')}` |
+| **Severity** | Breaking |
+{spec_link}
+### Files referencing this endpoint
 {files_md}
 
-### Recommended action
-Please review the files above and update any references to the changed endpoint or field.
-See the {display_name} API changelog for migration guidance.
+### Next steps
+1. Review the files listed above and update any references to the changed endpoint or field.
+2. Check the {display_name} API changelog for migration guidance.
 
 ---
-*This issue was automatically created by [DriftaBot](https://github.com/DriftaBot/specs).
-If this is a false positive, please close the issue.*
+*Created by [DriftaBot](https://github.com/DriftaBot/specs) · If this is a false positive, close the issue.*
 """
 
 
@@ -83,6 +92,8 @@ def run() -> None:
             companies_breaks[key] = {
                 "display_name": entry["display_name"],
                 "spec_type": entry["spec_type"],
+                "spec_path": entry["path"],
+                "commit_sha": entry.get("commit_sha", ""),
                 "changes": [],
             }
         companies_breaks[key]["changes"].extend(result["breaking_changes"])
@@ -91,6 +102,8 @@ def run() -> None:
     for company_name, info in companies_breaks.items():
         display = info["display_name"]
         spec_type = info["spec_type"]
+        spec_path = info["spec_path"]
+        commit_sha = info["commit_sha"]
         breaking_changes = info["changes"]
 
         # Phase 3: find consumer repos
@@ -113,7 +126,7 @@ def run() -> None:
 
                 # Phase 5: create issue
                 title = _issue_title(display, bc["description"])
-                body = _issue_body(display, spec_type, bc, usage["matched_files"])
+                body = _issue_body(display, spec_type, bc, usage["matched_files"], spec_path, commit_sha)
                 result = create_issue_plain(repo["full_name"], title, body)
                 if result["status"] == "created":
                     total_created += 1

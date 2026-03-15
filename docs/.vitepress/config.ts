@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-  title: 'DriftaBot Specs',
+  title: 'DriftaBot Registry',
   description: 'The central, always-up-to-date repository for public API specifications — with automatic breaking change detection and consumer notifications.',
   base: '/registry/',
 

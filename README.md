@@ -1,8 +1,8 @@
-# DriftaBot Specs
+# DriftaBot Registry
 
 The central, always-up-to-date repository for public API specifications from major companies.
 
-Specs are automatically fetched every 6 hours and diffed for breaking changes. Affected consumer repositories are notified via GitHub issues.
+API specs are automatically fetched every 6 hours and diffed for breaking changes. Affected consumer repositories are notified via GitHub issues.
 
 **[→ Full documentation](https://driftabot.github.io/registry/)**
 

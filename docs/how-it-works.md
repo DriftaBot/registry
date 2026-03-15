@@ -1,6 +1,6 @@
 # How It Works
 
-DriftaBot Specs has two automated pipelines: a **crawler** that keeps specs up to date, and a **notifier** that alerts consumer repos when breaking changes are detected.
+DriftaBot Registry has two automated pipelines: a **crawler** that keeps specs up to date, and a **notifier** that alerts consumer repos when breaking changes are detected.
 
 ## Crawler (every 6 hours)
 

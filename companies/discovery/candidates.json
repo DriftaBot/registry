@@ -1,5 +1,5 @@
 {
-  "discovered_at": "2026-03-15T14:08:25Z",
+  "discovered_at": "2026-03-15T14:15:54Z",
   "known_providers": 10,
   "candidate_count": 353,
   "by_type": {
@@ -9,7 +9,7 @@
   },
   "candidates": [
     {
-      "name": "6-dot-authentiqio",
+      "name": "authentiqid",
       "provider": "6-dot-authentiqio.appspot.com",
       "title": "Authentiq API",
       "description": "Strong authentication, without the passwords.",
@@ -39,7 +39,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "adobe",
+      "name": "shinesolutions",
       "provider": "adobe.com",
       "title": "Adobe Experience Manager (AEM) API",
       "description": "Swagger AEM is an OpenAPI specification for Adobe Experience Manager (AEM) API",
@@ -69,7 +69,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "airbyte",
+      "name": "airbytehq",
       "provider": "airbyte.local",
       "title": "Airbyte Configuration API",
       "description": "Airbyte Configuration API\n[https://airbyte.io](https://airbyte.io).\n\nThis API is a collection of HTTP RPC-style methods. While it is not a REST API, those familiar with REST should find the convention",
@@ -89,7 +89,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "amadeus",
+      "name": "amadeus4dev",
       "provider": "amadeus.com",
       "title": "Airline Code Lookup API",
       "description": "\nBefore using this API, we recommend you read our\u00a0**[Authorization Guide](https://developers.amadeus.com/self-service/apis-docs/guides/authorization-262)**\u00a0for more information on how to generate an a",
@@ -99,7 +99,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "amazonaws",
+      "name": "aws",
       "provider": "amazonaws.com",
       "title": "AWS Migration Hub",
       "description": "<p>The AWS Migration Hub API methods help to obtain server and application migration status and integrate your resource-specific migration tool by providing a programmatic interface to Migration Hub.<",
@@ -139,7 +139,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "apideck",
+      "name": "apideck-libraries",
       "provider": "apideck.com",
       "title": "Accounting API",
       "description": "Welcome to the Accounting API.\n\nYou can use this API to access all Accounting API endpoints.\n\n## Base URL\n\nThe base URL for all API requests is `https://unify.apideck.com`\n\nWe also provide a [Mock API",
@@ -159,7 +159,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "apimatic",
+      "name": "mermade",
       "provider": "apimatic.io",
       "title": "APIMATIC API Transformer",
       "description": "Transform API Descriptions from/to various formats",
@@ -169,7 +169,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "appveyor",
+      "name": "kevinoid",
       "provider": "appveyor.com",
       "title": "AppVeyor REST API",
       "description": "AppVeyor is a hosted continuous integration service which runs on Microsoft\nWindows.  The AppVeyor REST API provides a RESTful way to interact with the\nAppVeyor service.  This includes managing projec",
@@ -179,7 +179,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "archive",
+      "name": "archivelabs",
       "provider": "archive.org",
       "title": "Search Services",
       "description": "API for Internet Archive's Search-related services\n",
@@ -199,7 +199,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "asuarez",
+      "name": "albertsuarez",
       "provider": "asuarez.dev",
       "title": "SearchLy API v1",
       "description": "# Introduction\nThe SearchLy API provides similarity searching based on song lyrics.\n\n# Operations\nThe API allows for the `/similarity/by_song` operation, which allows clients to search the similarity ",
@@ -229,7 +229,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "bbc",
+      "name": "mermade",
       "provider": "bbc.com",
       "title": "BBC Nitro API",
       "description": "BBC Nitro is the BBC's application programming interface (API) for BBC Programmes Metadata.",
@@ -239,7 +239,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "bclaws",
+      "name": "bcgov",
       "provider": "bclaws.ca",
       "title": "BC Laws",
       "description": "BC Laws is an electronic library providing free public access to the laws of British Columbia. BC Laws is hosted by the Queen's Printer of British Columbia and published in partnership with the Minist",
@@ -259,7 +259,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "botify",
+      "name": "botify-labs",
       "provider": "botify.com",
       "title": "Botify API",
       "description": "Botify Saas API",
@@ -269,7 +269,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "botschaft",
+      "name": "ttymck",
       "provider": "botschaft.local",
       "title": "FastAPI",
       "description": "",
@@ -289,7 +289,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "browshot",
+      "name": "juliensobrier",
       "provider": "browshot.com",
       "title": "Browshot API",
       "description": "Take screenshots of any website in real time",
@@ -299,7 +299,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "bufferapp",
+      "name": "apis-guru",
       "provider": "bufferapp.com",
       "title": "Bufferapp",
       "description": "Social media management for marketers and agencies",
@@ -309,7 +309,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "bungie",
+      "name": "bungie-net",
       "provider": "bungie.net",
       "title": "Bungie.Net API",
       "description": "These endpoints constitute the functionality exposed by Bungie.net, both for more traditional website functionality and for connectivity to Bungie video games and their related functionality.",
@@ -329,7 +329,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "c19qrserver",
+      "name": "aijaz",
       "provider": "c19qrserver.local",
       "title": "API for the COVID-19 Tracking QR Code Signin Server.",
       "description": "This is the API for the COVID-19 Contact Tracing QRCode Signin Server",
@@ -349,7 +349,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "channel4",
+      "name": "mermade",
       "provider": "channel4.com",
       "title": "Channel 4 API",
       "description": "This is the place to come for all the technical details you need to power your applications with Channel 4's deep programmes data.",
@@ -359,7 +359,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "chompthis",
+      "name": "chompfoods",
       "provider": "chompthis.com",
       "title": "Chomp Food Database API Documentation",
       "description": "## Important\nAn **[API key](https://chompthis.com/api/)** is required for access to this API. Get yours at **[https://chompthis.com/api](https://chompthis.com/api/)**.\n\n### Getting Started\n  * **[Subs",
@@ -369,7 +369,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "circleci",
+      "name": "kamikazechaser",
       "provider": "circleci.com",
       "title": "CircleCI REST API",
       "description": "The CircleCI API is a RESTful, fully-featured API that allows you to do almost anything in CircleCI.\nYou can access all information and trigger all actions.\nThe only thing we don\u2019t provide access to i",
@@ -379,7 +379,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "cisco",
+      "name": "ciscopsirt",
       "provider": "cisco.com",
       "title": "Cisco PSIRT openVuln API",
       "description": "The Cisco Product Security Incident Response Team (PSIRT) openVuln API is a RESTful API that allows customers to obtain Cisco Security Vulnerability information in different machine-consumable formats",
@@ -399,7 +399,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "clubhouseapi",
+      "name": "zhuowei",
       "provider": "clubhouseapi.com",
       "title": "Clubhouse API",
       "description": "Clubhouse API",
@@ -409,7 +409,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "codat",
+      "name": "codatio",
       "provider": "codat.io",
       "title": "Accounting API",
       "description": "A flexible API for pulling accounting data, normalized and aggregated from 20 accounting integrations.\n\nStandardize how you connect to your customers\u2019 accounting software. View, create, update, and de",
@@ -419,7 +419,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "color",
+      "name": "meodai",
       "provider": "color.pizza",
       "title": "Color Name API",
       "description": "An API that provides names for colors based on their hex value",
@@ -429,7 +429,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "conjur",
+      "name": "cyberark",
       "provider": "conjur.local",
       "title": "Conjur",
       "description": "This is an API definition for CyberArk Conjur Open Source. You can find out more at [Conjur.org](https://www.conjur.org/).",
@@ -439,7 +439,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "cpy",
+      "name": "chocobozzz",
       "provider": "cpy.re",
       "title": "PeerTube",
       "description": "The PeerTube API is built on HTTP(S) and is RESTful. You can use your favorite\nHTTP/REST library for your programming language to use PeerTube. The spec API is fully compatible with\n[openapi-generator",
@@ -449,7 +449,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "dev",
+      "name": "forem",
       "provider": "dev.to",
       "title": "Forem API V1",
       "description": "Access Forem articles, users and other resources via API.\n        For a real-world example of Forem in action, check out [DEV](https://www.dev.to).\n        All endpoints can be accessed with the 'api-",
@@ -509,7 +509,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "fire",
+      "name": "firefinancialservices",
       "provider": "fire.com",
       "title": "Fire Financial Services Business API",
       "description": "The fire.com API allows you to deeply integrate Business Account features into your application or back-office systems.\n\nThe API provides read access to your profile, accounts and transactions, event-",
@@ -519,7 +519,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "flat",
+      "name": "flatio",
       "provider": "flat.io",
       "title": "Flat API",
       "description": "The Flat API allows you to easily extend the abilities of the [Flat Platform](https://flat.io), with a wide range of use cases including the following:\n\n* Creating and importing new music scores using",
@@ -539,7 +539,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "giphy",
+      "name": "faragorn",
       "provider": "giphy.com",
       "title": "Giphy API",
       "description": "Giphy API",
@@ -549,7 +549,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "gitlab",
+      "name": "mermade",
       "provider": "gitlab.com",
       "title": "Gitlab",
       "description": "The platform for modern developers\nGitLab unifies issues, code review, CI and CD into a single UI",
@@ -569,7 +569,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "gsmtasks",
+      "name": "oeklo",
       "provider": "gsmtasks.com",
       "title": "GSMTasks Project API",
       "description": "The GSMtasks API is a RESTful web service for developers to programmatically interact with GSMtasks data, real-time delivery and task management and route optimization functionality.",
@@ -589,7 +589,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "illumidesk",
+      "name": "3blades",
       "provider": "illumidesk.com",
       "title": "IllumiDesk",
       "description": "",
@@ -599,7 +599,7 @@
       "source": "apis.guru"
     },
     {
-      "name": "instagram",
+      "name": "darklynx",
       "provider": "instagram.com",
       "title": "Instagram API",
       "description": "Description of Instagram RESTful API.\n\nCurrent limitations:\n  * Instagram service does not support [cross origin headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS)\n  for s",
@@ -878,7 +878,7 @@
       "github_repo": "refinedev/refine",
       "spec_url": null,
       "spec_type": "graphql",
-      "stars": 34225,
+      "stars": 34226,
       "source": "github_topics",
       "topics": [
         "admin",
@@ -1360,7 +1360,7 @@
       "github_repo": "gofr-dev/gofr",
       "spec_url": null,
       "spec_type": "grpc",
-      "stars": 16413,
+      "stars": 16414,
       "source": "github_topics",
       "topics": [
         "framework",

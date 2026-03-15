@@ -1,0 +1,441 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Faretrotter Travel API",
+    "description": "Multimodal travel API to return modes of transportation between cities and points of interest.",
+    "version": "2.0"
+  },
+  "host": "api.faretrotter.com",
+  "basePath": "/v2.0/{apikey}",
+  "schemes": [
+    "https"
+  ],
+  "securityDefinitions": {
+    "ApiKeyAuth": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "ApiKeyAuth"
+    }
+  },
+  "definitions": {
+    "PlaceResponse": {
+      "title": "Place response",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "name_long": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "lat": {
+          "type": "number"
+        },
+        "lng": {
+          "type": "number"
+        },
+        "geoname_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "name_long",
+        "city",
+        "region",
+        "country",
+        "type",
+        "slug",
+        "lat",
+        "lng",
+        "geoname_id"
+      ],
+      "type": "object"
+    },
+    "PlacesResponse": {
+      "title": "Places response",
+      "properties": {
+        "status": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "number"
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "code",
+            "message"
+          ]
+        },
+        "request": {
+          "type": "object",
+          "properties": {
+            "environment": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "endpoint": {
+              "type": "string"
+            },
+            "fields": {
+              "type": "object",
+              "properties": {
+                "origin_lat": {
+                  "type": "number"
+                },
+                "origin_lng": {
+                  "type": "number"
+                },
+                "destination_lat": {
+                  "type": "number"
+                },
+                "destination_lng": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "origin_lat",
+                "origin_lng",
+                "destination_lat",
+                "destination_lng"
+              ]
+            },
+            "distance_miles": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "environment",
+            "version",
+            "endpoint",
+            "fields",
+            "distance_miles"
+          ]
+        },
+        "places": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PlaceResponse"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "request",
+        "places"
+      ],
+      "type": "object"
+    },
+    "RoutesResponse": {
+      "title": "Routes response",
+      "properties": {
+        "status": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "number"
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "code",
+            "message"
+          ]
+        },
+        "request": {
+          "type": "object",
+          "properties": {
+            "environment": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "endpoint": {
+              "type": "string"
+            },
+            "fields": {
+              "type": "object",
+              "properties": {
+                "origin_lat": {
+                  "type": "number"
+                },
+                "origin_lng": {
+                  "type": "number"
+                },
+                "destination_lat": {
+                  "type": "number"
+                },
+                "destination_lng": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "origin_lat",
+                "origin_lng",
+                "destination_lat",
+                "destination_lng"
+              ]
+            },
+            "distance_miles": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "environment",
+            "version",
+            "endpoint",
+            "fields",
+            "distance_miles"
+          ]
+        },
+        "data": {
+          "properties": {
+            "routes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "origin_id": {
+                    "type": "string"
+                  },
+                  "destination_id": {
+                    "type": "string"
+                  },
+                  "mode": {
+                    "type": "string"
+                  },
+                  "fare": {
+                    "type": "number"
+                  },
+                  "duration": {
+                    "type": "number"
+                  },
+                  "co2": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "origin_id",
+                  "destination_id",
+                  "mode",
+                  "fare",
+                  "duration",
+                  "co2"
+                ]
+              }
+            },
+            "places": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PlaceResponse"
+              }
+            },
+            "operators": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "logo_img": {
+                    "type": "string"
+                  },
+                  "mode": {
+                    "type": "string"
+                  },
+                  "code": {
+                    "type": "string"
+                  },
+                  "attributes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "id",
+                  "name",
+                  "logo_img",
+                  "mode",
+                  "code",
+                  "attributes"
+                ]
+              }
+            }
+          },
+          "required": [
+            "routes",
+            "places",
+            "operators"
+          ],
+          "type": "object"
+        },
+        "response": {
+          "type": "object",
+          "properties": {
+            "url": {
+              "type": "string"
+            },
+            "time": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "url",
+            "time"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "request",
+        "data",
+        "response"
+      ],
+      "type": "object"
+    }
+  },
+  "paths": {
+    "/places": {
+      "get": {
+        "summary": "Returns possible modes of transportation between two cities.",
+        "operationId": "GET_places",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Everything worked as expected.",
+            "schema": {
+              "$ref": "#/definitions/PlaceResponse"
+            }
+          },
+          "400": {
+            "description": "Parameters did not match the endpoint requirements. Check that all required fields are present and spelt correctly."
+          },
+          "401": {
+            "description": "Authentication Failed."
+          },
+          "402": {
+            "description": "All parameters are correct but the request failed."
+          },
+          "403": {
+            "description": "Request IP does not match IP address registered with key."
+          },
+          "404": {
+            "description": "The endpoint doesn't exist."
+          },
+          "429": {
+            "description": "Too many requests hit the API too quickly."
+          },
+          "501": {
+            "description": "Server error"
+          },
+          "502": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/routes": {
+      "get": {
+        "operationId": "GET_routes",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Everything worked as expected.",
+            "schema": {
+              "$ref": "#/definitions/RoutesResponse"
+            }
+          },
+          "400": {
+            "description": "Parameters did not match the endpoint requirements. Check that all required fields are present and spelt correctly."
+          },
+          "401": {
+            "description": "Authentication Failed."
+          },
+          "402": {
+            "description": "All parameters are correct but the request failed."
+          },
+          "403": {
+            "description": "Request IP does not match IP address registered with key."
+          },
+          "404": {
+            "description": "The endpoint doesn't exist."
+          },
+          "429": {
+            "description": "Too many requests hit the API too quickly."
+          },
+          "501": {
+            "description": "Server error"
+          },
+          "502": {
+            "description": "Server error"
+          }
+        },
+        "consumes": [
+          "text/html"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "required": true,
+            "type": "number",
+            "name": "origin_lat"
+          },
+          {
+            "in": "query",
+            "required": true,
+            "type": "number",
+            "name": "origin_lng"
+          },
+          {
+            "in": "query",
+            "required": true,
+            "type": "number",
+            "name": "destination_lat"
+          },
+          {
+            "in": "query",
+            "required": true,
+            "type": "number",
+            "name": "destination_lng"
+          }
+        ]
+      }
+    }
+  }
+}

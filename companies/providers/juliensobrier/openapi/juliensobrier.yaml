@@ -1,0 +1,1437 @@
+# this is an example of the Uber API
+# as a demonstration of an API spec in YAML
+swagger: '2.0'
+info:
+  title: Browshot API
+  description: Take screenshots of any website in real time
+  version: "1.17.0"
+  contact: 
+    name: API Support
+    email: "support@browshot.com"
+    url: https://browshot.com/contact
+  termsOfService: https://browshot.com/terms
+# the domain of the service
+host: api.browshot.com
+# array of all schemes that your API supports
+schemes:
+  - https
+# will be prefixed to all paths
+basePath: /api/v1
+produces:
+  - application/json
+securityDefinitions:
+  apiKeyQuery:
+    type: apiKey
+    name: key
+    in: query
+security:
+ - apiKeyQuery: []
+paths:
+  /screenshot/create:
+    get:
+      summary: Request a screenshot
+      operationId: CreateScreenshot
+      x-ms-trigger: none
+      description: |
+        Screenshots requests to private and shared instances require a positive balance.
+        
+        *IMPORTANT*: Remember that you can only do 100 free screenshots per month. To used a premium instance, use instance_id=65 for example.
+      parameters:
+      
+        # Required
+        - name: url
+          in: query
+          description: URL of the page to get a screenshot for
+          required: true
+          type: string
+        - name: instance_id
+          in: query
+          description: instance ID to use
+          required: true
+          type: integer
+          
+        # Common parameters 
+        - name: size
+          in: query
+          description: screenshot size - "screen" (default) or "page"
+          type: string
+          enum:
+            - screen
+            - page
+          default: screen
+        - name: cache
+          in: query
+          description: use a previous screenshot (same URL, same instance) if it was done within <cache_value> seconds. The default value is 24hours. Specify cache=0 if you want a new screenshot.
+          type: integer
+          default: 86400
+        - name: delay
+          in: query
+          description: number of seconds to wait after the page has loaded. This is used to let JavaScript run longer before taking the screenshot. Use delay=0 to take screenshots faster.
+          type: integer
+          default: 5
+          minimum: 0
+          maximum: 60
+        - name: flash_delay
+          in: query
+          description: number of seconds to wait after the page has loaded if Flash elements are present. Use flash_delay=0 to take screenshots faster.
+          type: integer
+          default: 10
+          minimum: 0
+          maximum: 30
+        - name: screen_width
+          in: query
+          description: width of the browser window. For desktop browsers only.
+          type: integer
+          minimum: 1
+          maximum: 2000
+          default: 1024
+        - name: screen_height
+          in: query
+          description: "height of the browser window. For desktop browsers only. (Note: full-page screenshots can have a height of up to 15,000px)"
+          type: integer
+          minimum: 1
+          maximum: 2000
+          default: 768
+          
+          # Optional parameters
+        - name: priority
+          in: query
+          description: assign priority to the screenshot (for private instances only)
+          type: integer
+          minimum: 1
+          maximum: 3
+        - name: referer
+          in: query
+          description: use a custom referrer header - paid screenshots only
+          type: string
+        - name: post_data
+          in: query
+          description: send a POST requests with post_data, useful for filling out forms - paid screenshots only
+          type: string
+        - name: cookie
+          in: query
+          description: set a cookie for the URL requested (see Custom POST Data, Referer and Cookie) Cookies should be separated by a ; - paid screenshots only
+          type: string
+        - name: script
+          in: query
+          description: URL of javascript file to execute after the page load event
+          type: string
+        - name: details
+          in: query
+          description: level of information available with screenshot/info
+          type: integer
+          minimum: 1
+          maximum: 3
+          default: 2
+        - name: html
+          in: query
+          description: saves the HTML of the rendered page which can be retrieved by the API call screenshot/html. This feature costs *1 credit* per screenshot.
+          type: integer
+          minimum: 0
+          maximum: 1
+          default: 0
+        - name: max_wait
+          description: "maximum number of seconds to wait before triggering the PageLoad event. Note that delay will still be used. (default: 0 = disabled)"
+          in: query
+          type: integer
+          minimum: 0
+          maximum: 60
+          default: 0
+        - name: headers
+          in: query
+          description: any custom HTTP headers. (Not supported with Internet Explorer)
+          type: string
+          
+        # Multiple screenshots
+        - name: shots
+          in: query
+          description: take multiple screenshots of the same page. This costs 1 additional credit for every 2 additional screenshots.
+          type: integer
+          minimum: 1
+          maximum: 10
+          default: 1
+        - name: shot_interval
+          in: query
+          description: number of seconds between 2 screenshots
+          type: integer
+          minimum: 1
+          maximum: 10
+          default: 5
+          
+          
+        # Hosting
+        - name: hosting
+          in: query
+          description: hosting option - s3 or browshot
+          type: string
+          enum:
+            - s3
+            - browshot
+        - name: hosting_height
+          in: query
+          description: maximum height of the thumbnail to host
+          type: integer
+          minimum: 1
+          maximum: 15000
+        - name: hosting_width
+          in: query
+          description: maximum height of the thumbnail to host
+          type: integer
+          minimum: 1
+          maximum: 2000
+        - name: hosting_scale
+          in: query
+          description: scale of the thumbnail to host
+          type: number
+          format: float
+          default: 1
+        - name: hosting_bucket
+          in: query
+          description: S3 bucket to upload the screenshot or thumbnail (required for S3)
+          type: string
+        - name: hosting_file
+          in: query
+          description: file name to use (for S3 only)
+          type: string
+        - name: hosting_headers
+          in: query
+          description: list of headers to add to the S3 object (for S3 only)
+          type: string
+      tags:
+        - Screenshot
+      responses:
+        200:
+          description: Request accepted
+          schema:
+            $ref: '#/definitions/Screenshot'
+        403:
+          description: Error
+          schema:
+            $ref: '#/definitions/ScreenshotError'
+            
+            
+  /screenshot/multiple:
+    get:
+      summary: Request multiple screenshots
+      operationId: CreateMultipleScreenshots
+      x-ms-trigger: none
+      description: |
+        Request multiple screenshots in one API call. The API call accepts all the parameters supported by screenshot/create.
+        You can specify up to 10 URLs and 10 instances for a total of 100 screenshots in one API call.
+      parameters:
+      
+        # Required
+        - name: url
+          in: query
+          description: URL of the page to get a screenshot for. You can specify multiple url parameters (up to 10).
+          required: true
+          type: string
+        - name: instance_id
+          in: query
+          description: instance ID to use. You can specify multiple instance_id parameters (up to 10).
+          required: true
+          type: integer
+          
+        # Common parameters 
+        - name: size
+          in: query
+          description: screenshot size - "screen" (default) or "page"
+          type: string
+          enum:
+            - screen
+            - page
+          default: screen
+        - name: cache
+          in: query
+          description: use a previous screenshot (same URL, same instance) if it was done within <cache_value> seconds. The default value is 24hours. Specify cache=0 if you want a new screenshot.
+          type: integer
+          default: 86400
+        - name: delay
+          in: query
+          description: number of seconds to wait after the page has loaded. This is used to let JavaScript run longer before taking the screenshot. Use delay=0 to take screenshots faster.
+          type: integer
+          default: 5
+          minimum: 0
+          maximum: 60
+        - name: flash_delay
+          in: query
+          description: number of seconds to wait after the page has loaded if Flash elements are present. Use flash_delay=0 to take screenshots faster.
+          type: integer
+          default: 10
+          minimum: 0
+          maximum: 30
+        - name: screen_width
+          in: query
+          description: width of the browser window. For desktop browsers only.
+          type: integer
+          minimum: 1
+          maximum: 2000
+          default: 1024
+        - name: screen_height
+          in: query
+          description: "height of the browser window. For desktop browsers only. (Note: full-page screenshots can have a height of up to 15,000px)"
+          type: integer
+          minimum: 1
+          maximum: 2000
+          default: 768
+          
+          # Optional parameters
+        - name: priority
+          in: query
+          description: assign priority to the screenshot (for private instances only)
+          type: integer
+          minimum: 1
+          maximum: 3
+        - name: referer
+          in: query
+          description: use a custom referrer header - paid screenshots only
+          type: string
+        - name: post_data
+          in: query
+          description: send a POST requests with post_data, useful for filling out forms - paid screenshots only
+          type: string
+        - name: cookie
+          in: query
+          description: set a cookie for the URL requested (see Custom POST Data, Referer and Cookie) Cookies should be separated by a ; - paid screenshots only
+          type: string
+        - name: script
+          in: query
+          description: URL of javascript file to execute after the page load event
+          type: string
+        - name: details
+          in: query
+          description: level of information available with screenshot/info
+          type: integer
+          minimum: 1
+          maximum: 3
+          default: 2
+        - name: html
+          in: query
+          description: saves the HTML of the rendered page which can be retrieved by the API call screenshot/html. This feature costs *1 credit* per screenshot.
+          type: integer
+          minimum: 0
+          maximum: 1
+          default: 0
+        - name: max_wait
+          description: "maximum number of seconds to wait before triggering the PageLoad event. Note that delay will still be used. (default: 0 = disabled)"
+          in: query
+          type: integer
+          minimum: 0
+          maximum: 60
+          default: 0
+        - name: headers
+          in: query
+          description: any custom HTTP headers. (Not supported with Internet Explorer)
+          type: string
+          
+          # Hosting
+        - name: hosting
+          in: query
+          description: hosting option - s3 or browshot
+          type: string
+          enum:
+            - s3
+            - browshot
+        - name: hosting_height
+          in: query
+          description: maximum height of the thumbnail to host
+          type: integer
+          minimum: 1
+          maximum: 15000
+        - name: hosting_width
+          in: query
+          description: maximum height of the thumbnail to host
+          type: integer
+          minimum: 1
+          maximum: 2000
+        - name: hosting_scale
+          in: query
+          description: scale of the thumbnail to host
+          type: number
+          format: float
+          default: 1
+        - name: hosting_bucket
+          in: query
+          description: S3 bucket to upload the screenshot or thumbnail (required for S3)
+          type: string
+        - name: hosting_file
+          in: query
+          description: file name to use (for S3 only)
+          type: string
+        - name: hosting_headers
+          in: query
+          description: list of headers to add to the S3 object (for S3 only)
+          type: string
+      tags:
+        - Screenshot
+      responses:
+        200:
+          description: Request accepted
+          schema:
+            $ref: '#/definitions/ScreenshotList'
+        403:
+          description: Error
+          schema:
+            $ref: '#/definitions/ScreenshotError'
+            
+  /screenshot/info:
+    get:
+      summary: Query screenshot status
+      operationId: GetScreenshotInfo
+      description: Once a screenshot has been requested, its status must be checked until it is either "error" or "finished".
+      parameters:
+        - name: id
+          in: query
+          description: screenshot ID received from /api/v1/screenshot/create
+          required: true
+          type: integer
+        - name: details
+          in: query
+          description: level of details about the screenshot and the page
+          type: integer
+          minimum: 0
+          maximum: 3
+          default: 2
+          
+      tags:
+        - Screenshot
+      responses:
+        200:
+          description: Screenshot found
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Screenshot'
+        default:
+          description: Screenshot not found
+          schema:
+            $ref: '#/definitions/ScreenshotInfoError'
+
+  /screenshot/list:
+    get:
+      summary: Get information about screenshots
+      operationId: GetMultipleScreenshotsInfo
+      description: Get information about the last 100 screenshots requested.
+      x-ms-visibility: none
+      parameters:
+        - name: limit
+          in: query
+          description: maximum number of screenshots' information to return
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 100
+        - name: status
+          in: query
+          description: get list of screenshot in a given status (error, finished, in_process)
+          type: string
+          enum:
+            - error
+            - finished
+            - in_process
+          
+      tags:
+        - Screenshot
+      responses:
+        200:
+          description: list of screenshot information
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ScreenshotList'
+        default:
+          description: Screenshot not found
+          schema:
+            $ref: '#/definitions/ScreenshotError'
+            
+  /screenshot/search:
+    get:
+      summary: Search for screenshots
+      operationId: SearchScreenshot
+      description: Search for screenshots of a specific URL.
+      x-ms-visibility: none
+      parameters:
+        - name: url
+          in: query
+          description: look for a string matching the URL requested
+          type: string
+          required: true
+        - name: limit
+          in: query
+          description: maximum number of screenshots' information to return
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 50
+        - name: status
+          in: query
+          description: get list of screenshot in a given status (error, finished, in_process)
+          type: string
+          enum:
+            - error
+            - finished
+            - in_process
+          
+      tags:
+        - Screenshot
+      responses:
+        200:
+          description: list of screenshot information
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ScreenshotList'
+        default:
+          description: Screenshot not found
+          schema:
+            $ref: '#/definitions/ScreenshotError'
+            
+  /screenshot/host:
+    get:
+      summary: Host thumbnails on your own S3 account or on Browshot.
+      description: You can host screenshots and thumbnails on your own S3 account or on Browshot.
+      x-ms-trigger: none
+      operationId: HostScreenshot
+      parameters:
+        - name: id
+          in: query
+          description: screenshot ID
+          type: integer
+          required: true
+        - name: hosting
+          in: query
+          description: "hosting option: s3 or browshot"
+          type: string
+          enum:
+            - s3
+            - browshot
+          required: true
+        - name: width
+          in: query
+          description: width of the thumbnail
+          type: integer
+          minimum: 1
+          maximum: 2000
+        - name: height
+          in: query
+          description: height of the thumbnail
+          type: integer
+          minimum: 1
+          maximum: 15000
+        - name: scale
+          in: query
+          description: scale of the thumbnail
+          type: number
+          format: double
+          default: 1.0
+        - name: bucket
+          in: query
+          description: S3 bucket to upload the screenshot or thumbnail - required with hosting=s3
+          type: string
+        - name: file
+          in: query
+          description: file name to use - optional, used with hosting=s3
+          type: string
+        - name: headers
+          in: query
+          description: HTTP headers to add to your S3 object - optional, used with hosting=s3
+          type: string  
+          
+      tags:
+        - Screenshot
+      responses:
+        200:
+          description: list of screenshot information
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ScreenshotHost'
+        default:
+          description: Screenshot not found
+          schema:
+            $ref: '#/definitions/ScreenshotInfoError'
+            
+  /screenshot/thumbnail:
+    get:
+      summary: Retrieve a thumbnail image
+      operationId: GetThumbnail
+      x-ms-trigger: none
+      description: |
+        Unlike the other API calls, this API sends back the thumbnail as a PNG file, not JSON. The HTTP response code indicates whether the screenshot was successful (200), or incomplete (404) or failed (404). If the screenshot failed or is not finished, a default image "Not found" is sent.
+        
+        You can crop your screenshots. The crop is done first, then the thumbnail. You can take a 1024x768 screenshot, crop it to 768x768, and get it scaled down to 300x300.
+      produces:
+        - image/png
+        - image/jpeg
+      parameters:
+        - name: id
+          in: query
+          description: screenshot ID
+          type: integer
+          required: true
+        - name: width
+          in: query
+          description: width of the thumbnail
+          type: integer
+          minimum: 1
+          maximum: 2000
+        - name: height
+          in: query
+          description: height of the thumbnail
+          type: integer
+          minimum: 1
+          maximum: 15000
+        - name: scale
+          in: query
+          description: scale of the thumbnail
+          type: number
+          format: double
+          default: 1.0
+        - name: zoom
+          description: zoom 1 to 100 percent
+          in: query
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 100
+        - name: ratio
+          in: query
+          description: "Use fit to keep the original page ration, and fill to get a thumbnail for the exact width and height.  specified. If you provide both width and height, you need to specify the ratio: fit to keep the original width/height ratio (the thumbnail might be smaller than the specified width and height), or fill to crop the image if necessary."
+          type: string
+          enum:
+            - fit
+            - fill
+          default: fit
+        - name: left
+          in: query
+          description: left edge of the area to be cropped
+          type: integer
+          minimum: 0
+          default: 0
+        - name: right
+          in: query
+          description: right edge of the area to be cropped
+          type: integer
+          minimum: 0
+          default: 0
+        - name: top
+          in: query
+          description: top edge of the area to be cropped
+          type: integer
+          minimum: 0
+          default: 0
+        - name: bottom
+          in: query
+          description: bottom edge of the area to be cropped
+          type: integer
+        - name: format
+          in: query
+          description: image as PNG or JPEG
+          type: string
+          enum:
+            - png
+            - jpeg
+          default: png
+        - name: shot
+          in: query
+          description: get the second or third screenshot if multiple screenshots were requested
+          type: integer
+          minimum: 1
+          maximum: 10
+          default: 1
+        - name: quality
+          in: query
+          description: JPEG quality factor (for JPEG thumbnails only)
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 100
+          
+      tags:
+        - Screenshot
+      responses:
+        200:
+          description: thumbnail
+        404:
+          description: Screenshot not found
+
+            
+  /screenshot/share:
+    get:
+      summary: Share a screenshot
+      operationId: ShareScreenshot
+      x-ms-trigger: none
+      description: |
+        You can make your screenshots public, add notes, and share it with your friends and colleagues. Only screenshots which are successfully completed can be shared.n the thumbnail. You can take a 1024x768 screenshot, crop it to 768x768, and get it scaled down to 300x300.
+      parameters:
+        - name: id
+          in: query
+          description: screenshot ID
+          type: integer
+          required: true
+        - name: note
+          in: query
+          description: note to add on the sharing page
+          type: string
+        
+      tags:
+        - Screenshot
+      responses:
+        200:
+          description: list of screenshot information
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ScreenshotHost'
+        default:
+          description: Screenshot not found
+          schema:
+            $ref: '#/definitions/ScreenshotInfoError'
+
+  /screenshot/delete:
+    get:
+      summary: Delete screenshot data
+      operationId: DeleteScreenshot
+      x-ms-trigger: none
+      description: |
+        You can delete details of your screenshots to remove any confidential information.
+      parameters:
+        - name: id
+          in: query
+          description: screenshot ID
+          type: integer
+          required: true
+        - name: data
+          in: query
+          description: |
+            data to remove. You can specify multiple of them (separated by a ,): *image* (image files), *url* (url requested), *metadata* (time added, time finished, post data, cookie and referer used for the screenshot), *all* (all data and files)
+          type: string
+          default: image
+        
+      tags:
+        - Screenshot
+      responses:
+        200:
+          description: list of screenshot information
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ScreenshotShort'
+        default:
+          description: Screenshot not found
+          schema:
+            $ref: '#/definitions/ScreenshotError'
+
+  /screenshot/html:
+    get:
+      summary: Get the HTML code
+      operationId: GetHTML
+      description: |
+        Retrieve the HTML code of the rendered page. This API call should be used when html=1 was specified in the screenshot request.
+      produces:
+        - text/html
+      parameters:
+        - name: id
+          in: query
+          description: screenshot ID
+          type: integer
+          required: true
+          
+      tags:
+        - Screenshot
+      responses:
+        default:
+          description: HTML code
+
+  /batch/ceate:
+    post:
+      consumes: 
+        - multipart/form-data
+      summary: Requests thousands of screenshtos at once
+      operationId: CreateBatch
+      x-ms-trigger: none
+      description: |
+        Get hundreds or thousands of screenshots from a text file. You can use this API call or the dashboard. Unlike the other API calls, you must issue a POST request with the Content-Type "multipart/form-data" in order to upload the text file. The text file must contain the list of URLs to request, 1 URL per line. Failed screenshots will be tried up to 3 times before giving up.
+      parameters:
+        - name: instance_id
+          in: formData
+          description: instance ID to use
+          type: integer
+          required: true
+        - name: file
+          in: formData
+          description: text file to use
+          type: file
+          
+                # Common parameters 
+        - name: size
+          in: formData
+          description: screenshots size - "screen" (default) or "page"
+          type: string
+          enum:
+            - screen
+            - page
+          default: screen
+        - name: name
+          in: formData
+          description: name of the batch
+          type: string
+        - name: width
+          in: formData
+          description: thumbnail width.
+          type: integer
+          minimum: 1
+          maximum: 2000
+          default: 1024
+        - name: height
+          in: formData
+          description: thumbnail height
+          type: integer
+          minimum: 1
+          maximum: 15000
+        - name: delay
+          in: formData
+          description: number of seconds to wait after the page has loaded. This is used to let JavaScript run longer before taking the screenshot. Use delay=0 to take screenshots faster.
+          type: integer
+          default: 5
+          minimum: 0
+          maximum: 60
+        - name: flash_delay
+          in: formData
+          description: number of seconds to wait after the page has loaded if Flash elements are present. Use flash_delay=0 to take screenshots faster.
+          type: integer
+          default: 10
+          minimum: 0
+          maximum: 30
+        - name: screen_width
+          in: formData
+          description: width of the browser window. For desktop browsers only.
+          type: integer
+          minimum: 1
+          maximum: 2000
+          default: 1024
+        - name: screen_height
+          in: formData
+          description: "height of the browser window. For desktop browsers only. (Note: full-page screenshots can have a height of up to 15,000px)"
+          type: integer
+          minimum: 1
+          maximum: 2000
+          default: 768
+          
+          # Optional parameters
+        - name: priority
+          in: formData
+          description: assign priority to the screenshot (for private instances only)
+          type: integer
+          minimum: 1
+          maximum: 3
+        - name: referer
+          in: formData
+          description: use a custom referrer header - paid screenshots only
+          type: string
+        - name: post_data
+          in: formData
+          description: send a POST requests with post_data, useful for filling out forms - paid screenshots only
+          type: string
+        - name: cookie
+          in: formData
+          description: set a cookie for the URL requested (see Custom POST Data, Referer and Cookie) Cookies should be separated by a ; - paid screenshots only
+          type: string
+        - name: script
+          in: formData
+          description: URL of javascript file to execute after the page load event
+          type: string
+        - name: details
+          in: formData
+          description: level of information available with screenshot/info
+          type: integer
+          minimum: 1
+          maximum: 3
+          default: 2
+        - name: html
+          in: formData
+          description: saves the HTML of the rendered page which can be retrieved by the API call screenshot/html. This feature costs *1 credit* per screenshot.
+          type: integer
+          minimum: 0
+          maximum: 1
+          default: 0
+        - name: max_wait
+          in: formData
+          description: "maximum number of seconds to wait before triggering the PageLoad event. Note that delay will still be used. (default: 0 = disabled)"
+          type: integer
+          minimum: 0
+          maximum: 60
+          default: 0
+        - name: headers
+          in: formData
+          description: any custom HTTP headers. (Not supported with Internet Explorer)
+          type: string
+        - name: format
+          in: formData
+          description: image as PNG or JPEG
+          type: string
+          enum:
+            - png
+            - jpeg
+          default: png
+          
+        # Hosting
+        - name: hosting
+          in: query
+          description: hosting option - s3 or browshot
+          type: string
+          enum:
+            - s3
+        - name: hosting_height
+          in: query
+          description: maximum height of the thumbnail to host
+          type: integer
+          minimum: 1
+          maximum: 15000
+        - name: hosting_width
+          in: query
+          description: maximum height of the thumbnail to host
+          type: integer
+          minimum: 1
+          maximum: 2000
+        - name: hosting_scale
+          in: query
+          description: scale of the thumbnail to host
+          type: number
+          format: float
+          default: 1
+        - name: hosting_bucket
+          in: query
+          description: S3 bucket to upload the screenshot or thumbnail (required for S3)
+          type: string
+        - name: hosting_file
+          in: query
+          description: file name to use (for S3 only)
+          type: string
+        - name: hosting_headers
+          in: query
+          description: list of headers to add to the S3 object (for S3 only)
+          type: string
+          
+      tags:
+        - Batch
+      responses:
+        200:
+          description: batch information
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Batch'
+        default:
+          description: Batch not created
+          schema:
+            $ref: '#/definitions/BatchError'
+
+  /batch/info:
+    get:
+      summary: Get the batch status
+      operationId: GetBatchInfo
+      description: |
+        Get the status of a batch requested through the API or through the dashboard.
+      parameters:
+        - name: id
+          in: query
+          description: batch ID
+          type: integer
+          required: true
+          
+      tags:
+        - Batch
+      responses:
+        200:
+          description: batch information
+          schema:
+            $ref: '#/definitions/Batch'
+        default:
+          description: Batch not found
+          schema:
+            $ref: '#/definitions/BatchError'
+            
+  /account/info:
+    get:
+      summary: Get information about your account
+      operationId: GetAccountInfo
+      description: Get information about your account.
+      x-ms-trigger: single
+      parameters:
+        - name: details
+          in: query
+          description: level of information returned
+          type: integer
+          minimum: 1
+          maximum: 3
+          default: 1
+          
+      tags:
+        - Account
+      responses:
+        200:
+          description: Account information
+          schema:
+            $ref: '#/definitions/Account'
+        default:
+          description: Account not found
+          schema:
+            $ref: '#/definitions/AccountError'
+     
+            
+  /instance/info:
+    get:
+      summary: Get information about an instance
+      operationId: GetInstanceInfo
+      description: Get information about an instance.
+      x-ms-visibility: none
+      parameters:
+        - name: id
+          in: query
+          description: instance ID
+          type: integer
+          required: true
+          
+      tags:
+        - Instance
+      responses:
+        200:
+          description: Instance information
+          schema:
+            $ref: '#/definitions/Instance'
+        default:
+          description: Account not found
+          schema:
+            $ref: '#/definitions/InstanceError'
+            
+  /instance/list:
+    get:
+      summary: Get all instances
+      operationId: GetInstancesInfo
+      description: Get all instances.
+      x-ms-visibility: none
+          
+      tags:
+        - Instance
+      responses:
+        200:
+          description: Instance information
+          schema:
+            $ref: '#/definitions/InstanceList'
+        default:
+          description: Account not found
+          schema:
+            $ref: '#/definitions/InstanceError' 
+
+
+  /browser/info:
+    get:
+      summary: Get information about a browser
+      operationId: GetBrowserInfo
+      description: Get information about a browser.
+      x-ms-visibility: none
+      parameters:
+        - name: id
+          in: query
+          description: browser ID
+          type: integer
+          required: true
+          
+      tags:
+        - Browser
+      responses:
+        200:
+          description: Browser information
+          schema:
+            $ref: '#/definitions/Browser'
+        default:
+          description:  Browser not found
+          schema:
+            $ref: '#/definitions/BrowserError'
+            
+  /browser/list:
+    get:
+      summary: Get all browsers
+      operationId: GetBrowsersInfo
+      description: Get all browsers.
+      x-ms-visibility: none
+          
+      tags:
+        -  Browser
+      responses:
+        200:
+          description: Instance information
+          schema:
+            $ref: '#/definitions/BrowserList'
+        default:
+          description: Account not found
+          schema:
+            $ref: '#/definitions/BrowserError'
+            
+definitions:
+  ScreenshotError:
+    type: object
+    properties:
+      error:
+        type: string
+        description: description of the problem that occurred
+      status:
+        type: string
+        description: status of the request - "in_queue", "processing", "finished", "error"
+      priority:
+        type: number
+        description: priority given to the screenshot - high (1) to low (3)
+      cost:
+        type: number
+        description: number of credits taken
+        
+  ScreenshotInfoError:
+    type: object
+    properties:
+      id:
+        description: screenshot ID
+        type: integer
+      error:
+        type: string
+        description: description of the problem that occurred
+      status:
+        type: string
+        description: status of the request - "in_queue", "processing", "finished", "error"
+        
+  ScreenshotShort:
+    type: object
+    properties:
+      id:
+        description: screenshot ID
+        type: integer
+      status: 
+        description: |
+          status of the request
+        type: string
+        enum:
+         - ok
+         - error
+        
+  Screenshot:
+    type: object
+    required:
+      - id
+      - status
+      - url
+      - instance_id
+    properties:
+      id:
+        description: screenshot ID
+        type: integer
+      status: 
+        description: |
+          status of the request: "in_queue", "processing", "finished", "error"
+        type: string
+        enum:
+         - in_queue
+         - processing
+         - finished
+         - error
+      screenshot_url: 
+        description: URL to download the screenshot
+        format: string
+      error: 
+        description: description of the problem that occurred
+        type: string
+      priority: 
+        description: "priority given to the screenshot: high (1) to low (3)"
+        type: integer
+        minimum: 1
+        maximum: 3
+      url: 
+        description: original URL requested
+        type: string
+      size: 
+        description: screenshot size requested
+        type: string
+        enum:
+          - screen
+          - page
+      width: 
+        description: screenshot width
+        type: integer
+      height: 
+        description: screenshot height
+        type: integer
+      final_url: 
+        description: URL of the screenshot (redirections can occur)
+        type: string
+      scale: 
+        description: image scale. Always 1 for desktop browsers; mobiles may change the scale (zoom in or zoom out) to fit the page on the screen
+        type: number
+        format: double
+      instance_id:
+        description: instance ID used for the screenshot
+        type: integer
+      cost: 
+        description: number of credits spent for the screenshot
+        type: integer
+      referer: 
+        description: custom referrer used (see Custom POST Data, Referer and Cookie)
+        type: string
+      post_data: 
+        description: POST data sent (see Custom POST Data, Referer and Cookie)
+        type: string
+      cookie: 
+        description: custom cookie used (see Custom POST Data, Referer and Cookie)
+        type: string
+      delay: 
+        description: number of seconds to wait after page load
+        type: integer
+      flash_delay: 
+        description: number of seconds to wait after page load if Flash elements are present
+        type: integer
+      details:
+        description: level of details about the screenshot and the page
+        type: integer
+        minimum: 0
+        maximum: 3
+      script: 
+        description: URL of optional javascript file executed after the page load event
+        type: string
+      shared_url: 
+        description: if the screenshot was shared, show the public URL
+        type: string
+        
+  ScreenshotList:
+    type: object
+    properties:
+      default:
+        type: number
+    additionalProperties: 
+      $ref: '#/definitions/Screenshot'
+
+  ScreenshotHost:
+    type: object
+    properties:
+      id: 
+        description: screenshot ID
+        type: integer
+      status: 
+        description: |
+          status of the request: "error", "ok" or "in_queue"
+        type: string
+        enum:
+          - error
+          - ok
+          - in_queue
+      url: 
+        description: URL to the hosted screenshot or thumbnail
+        type: string
+  
+  Batch:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: batch ID
+      status:
+        type: string
+        description: status of the request - "in_queue", "processing", "finished", "error"
+        enum:
+          - in_queue
+          - processing
+          - finished
+          - error
+      started:
+        type: integer
+        description: time of processing (UNIX timestamp)
+      finished:
+        type: integer
+        description: time of batch completed (UNIX timestamp)
+      count:
+        type: integer
+        description: number of unique URLs in the batch  
+      processed:
+        type: integer
+        description: number of screenshots finishe   
+      failed:
+        type: integer
+        description: number of screenshots failed  
+      urls:
+        type: array
+        description: URLs to download the batch
+        items:
+          type: string
+        
+  BatchError:
+    type: object
+    properties:
+      error:
+        type: string
+        description: description of the problem that occurred
+      status:
+        type: string
+        description: status of the request - "in_queue", "processing", "finished", "error"
+
+
+  AccountError:
+    type: object
+    properties:
+      error:
+        type: string
+        description: description of the problem that occurred
+      status:
+        type: string
+        description: status of the request - error
+
+  Account:
+    type: object
+    required:
+      - balance
+      - free_screenshots_left
+      - private_instances
+      - hosting_browshot
+    properties:
+      # details=1
+      balance: 
+        description: number of credits left on your account
+        type: integer
+      free_screenshots_left: 
+        description: number of free screenshots available for the current month
+        type: integer
+      private_instances: 
+        description: 1 is your account is authorized to create and use private instances, 0 otherwise (default)
+        type: integer
+        minimum: 0
+        maximum: 1
+        default: 0
+      hosting_browshot: 
+        description: 1 is your account is authorized to request hosting on Browshot, 0 otherwise (default)
+        type: integer
+        minimum: 0
+        maximum: 1
+        default: 0
+
+      # details=2
+      instances: 
+        description: list of private instances as returned by /api/v1/instance/list
+        type: array
+        items:
+          $ref: '#/definitions/Instance'
+      browsers: 
+        description: list of custom browsers as returned by /api/v1/browser/list
+        type: array
+        items:
+          $ref: '#/definitions/Browser'
+
+      # details=3
+      screenshots:
+        description: list of 10 latest screenshots requests as returned by /api/v1/screenshot/list
+        type: array
+        items:
+          $ref: '#/definitions/Screenshot'
+          
+          
+  InstanceList:
+    type: object
+    properties:
+      shared:
+        type: array
+        items: 
+          $ref: '#/definitions/Instance'
+      free:
+        type: array
+        items: 
+          $ref: '#/definitions/Instance'
+      private:
+        type: array
+        items: 
+          $ref: '#/definitions/Instance'
+      
+  Instance:
+    type: object
+    properties:
+      id: 
+        description: instance ID (required to requests screenshots)
+        type: integer
+      width: 
+        description: screen width in pixels
+        type: integer
+      height: 
+        description: screen height in pixels
+        type: integer
+      load: 
+        description: |
+          instance load: 
+          < 1: new screenshot requests will be processed immediately, 
+          1-2: new screenshot requests will be processed in about two minutes, 
+          2-3: new screenshot requests will be processed in about four minutes, 
+          3-4: new screenshot requests will be processed in about six minutes, 
+          etc.
+        type: number
+        format: float
+      browser: 
+        $ref: '#/definitions/Browser'
+      type:
+        description: public, shared or private
+        type: string
+        enum:
+          - public
+          - shared
+          - private
+      screenshot_cost: 
+        description: number of credits for each screenshot
+        type: integer
+      country: 
+        description: instance's country of origin
+        type: string
+
+  InstanceError:
+    type: object
+    properties:
+      error:
+        type: string
+        description: description of the problem that occurred
+      status:
+        type: string
+        description: status of the request - error    
+
+  Browser:
+    type: object
+    properties:
+      id: 
+        description: browser ID
+        type: integer
+      name: 
+        description: "browser name and version: Firefox 45, etc."
+        type: string
+      javascript: 
+        description: "JavaScript support: 1 if enabled, 0 if disabled"
+        type: integer
+        minimum: 0
+        maximum: 1
+      flash:
+        description: "Flash support: 1 if enabled, 0 if disabled"
+        type: integer
+        minimum: 0
+        maximum: 1
+      mobile:
+        description: "Mobile browser: 1 if true, 0 if false"
+        type: integer
+        minimum: 0
+        maximum: 1
+        
+  BrowserList:
+    type: object
+    properties:
+      default:
+        type: integer
+    additionalProperties: 
+      $ref: '#/definitions/Browser'
+      
+  BrowserError:
+    type: object
+    properties:
+      error:
+        type: string
+        description: description of the problem that occurred
+      status:
+        type: string
+        description: status of the request - error 

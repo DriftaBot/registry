@@ -15,7 +15,7 @@ from datetime import datetime
 
 import httpx
 
-from crawler.config import REPO_ROOT, load_registry
+from crawler.config import REPO_ROOT, COMPANIES_YAML, load_registry
 
 APIS_GURU_URL = "https://api.apis.guru/v2/list.json"
 GITHUB_API    = "https://api.github.com"
@@ -122,7 +122,7 @@ def _discover_apis_guru(known: set[str]) -> list[dict]:
         # api_key examples: "stripe.com", "amazonaws.com:s3", "twilio.com"
         provider  = api_key.split(":")[0]
         base_name = provider.split(".")[0].lower()
-        if _is_known(base_name, base_name, known) or provider.lower() in known:
+        if _is_known(base_name, base_name, known) or provider.lower() in known or base_name in known:
             continue
 
         preferred = api_info.get("preferred", "")
@@ -156,8 +156,11 @@ def _discover_apis_guru(known: set[str]) -> list[dict]:
             continue  # skip APIs not sourced from GitHub
 
         info = vinfo.get("info", {})
+        # Use GitHub repo owner as the canonical name — it's always clean.
+        # The APIs.guru api_key (e.g. "6-dot-authentiqio.appspot.com") is unreliable.
+        owner = github_repo.split("/")[0].lower()
         candidates.append({
-            "name":        base_name,
+            "name":        owner,
             "provider":    provider,
             "title":       info.get("title", ""),
             "description": (info.get("description") or "")[:200],
@@ -240,6 +243,104 @@ def _discover_github_topics(known: set[str], seen_repos: set[str]) -> list[dict]
 
 
 # ---------------------------------------------------------------------------
+# Save discovered specs + register new providers
+# ---------------------------------------------------------------------------
+
+def _path_from_spec_url(spec_url: str) -> str | None:
+    """Extract the file path portion from a raw.githubusercontent.com URL."""
+    raw_prefix = "https://raw.githubusercontent.com/"
+    if spec_url.startswith(raw_prefix):
+        parts = spec_url[len(raw_prefix):].split("/")
+        # parts: [owner, repo, branch, *path_segments]
+        if len(parts) >= 4:
+            return "/".join(parts[3:])
+    return None
+
+
+def _fetch_and_save_spec(candidate: dict) -> bool:
+    """
+    Download the spec from spec_url and save to
+    companies/providers/<name>/<spec_type>/<name>.<ext>.
+    Returns True on success.
+    """
+    spec_url = candidate.get("spec_url")
+    if not spec_url:
+        return False
+
+    name      = candidate["name"]
+    spec_type = candidate.get("spec_type", "openapi")
+    ext       = ".yaml" if spec_url.rstrip("?").rsplit(".", 1)[-1] in ("yaml", "yml") else ".json"
+    out_path  = REPO_ROOT / "companies" / "providers" / name / spec_type / f"{name}{ext}"
+
+    try:
+        with httpx.Client(timeout=30, follow_redirects=True) as c:
+            r = c.get(spec_url)
+            r.raise_for_status()
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_bytes(r.content)
+        print(f"  [saved]    {out_path.relative_to(REPO_ROOT)}")
+        return True
+    except Exception as exc:
+        print(f"  [error]    {name}: {exc}")
+        return False
+
+
+def _register_provider(candidate: dict) -> None:
+    """
+    Append a minimal entry to provider.companies.yaml.
+    Uses raw text append (like register_consumer) to preserve existing comments.
+    """
+    name      = candidate["name"]
+    spec_type = candidate.get("spec_type", "openapi")
+    spec_url  = candidate.get("spec_url", "")
+    ext       = ".yaml" if spec_url.rstrip("?").rsplit(".", 1)[-1] in ("yaml", "yml") else ".json"
+    repo_path = _path_from_spec_url(spec_url) or ""
+    output    = f"companies/providers/{name}/{spec_type}/{name}{ext}"
+    title     = (candidate.get("title") or "").strip()
+    display   = title if title else name.capitalize()
+
+    block = (
+        f"\n  - name: {name}\n"
+        f"    display_name: {display}\n"
+        f"    specs:\n"
+        f"      - type: {spec_type}\n"
+        f"        repo: {candidate['github_repo']}\n"
+        f"        path: {repo_path}\n"
+        f"        output: {output}\n"
+    )
+
+    current = COMPANIES_YAML.read_text()
+    COMPANIES_YAML.write_text(current.rstrip("\n") + block)
+    print(f"  [registry] added '{name}' to provider.companies.yaml")
+
+
+def save_new_providers(candidates: list[dict], known_names: set[str]) -> int:
+    """
+    For each APIs.guru candidate with a spec_url that isn't already registered:
+      1. Download and save the spec file.
+      2. Append a minimal entry to provider.companies.yaml.
+    Returns the count of newly added providers.
+    """
+    added = 0
+    guru_with_url = [
+        c for c in candidates
+        if c.get("source") == "apis.guru" and c.get("spec_url")
+    ]
+    print(f"\nSaving specs for {len(guru_with_url)} APIs.guru candidates...")
+
+    for c in guru_with_url:
+        name = c["name"]
+        if name in known_names:
+            continue  # already tracked (shouldn't happen, but be safe)
+        if _fetch_and_save_spec(c):
+            _register_provider(c)
+            known_names.add(name)
+            added += 1
+
+    return added
+
+
+# ---------------------------------------------------------------------------
 # Main entry point
 # ---------------------------------------------------------------------------
 
@@ -305,6 +406,10 @@ def run() -> None:
         + "\n"
     )
     print(f"Saved → {_OUTPUT.relative_to(REPO_ROOT)}")
+
+    # Download specs and register new providers (APIs.guru candidates only)
+    added = save_new_providers(top, known)
+    print(f"\nNew providers registered: {added}")
 
     # Pretty-print top 10 for the workflow log
     print("\nTop 10 candidates:")

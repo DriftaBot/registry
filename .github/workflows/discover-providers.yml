@@ -32,7 +32,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python -m discoverer
 
-      - name: Commit discovery report
+      - name: Commit discovery results
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -40,7 +40,7 @@ jobs:
           git config user.email "crawler@driftabot.dev"
           git remote set-url origin \
             "https://x-access-token:${GITHUB_TOKEN}@github.com/DriftaBot/registry.git"
-          git add companies/discovery/
+          git add companies/discovery/ companies/providers/ provider.companies.yaml
           git diff --cached --quiet && echo "No changes to commit." || \
-            git commit -m "chore: update provider discovery candidates [skip ci]" \
+            git commit -m "chore: discover and register new API providers [skip ci]" \
             && git pull --rebase && git push

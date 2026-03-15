@@ -1,0 +1,681 @@
+openapi: 3.0.3
+info:
+  title: Color Name API
+  description: |
+    An API that provides names for colors based on their hex value.
+
+    Features:
+    - RESTful HTTP endpoints to search for colors by name or hex value
+    - Real-time color data via Socket.io for instant updates
+    - Optimized responses with gzip compression
+    - Multiple curated color name lists to choose from
+    - Custom referrer tracking via X-Referrer header
+  version: 1.1.0
+  license:
+    name: MIT
+    url: https://github.com/meodai/color-name-api/blob/main/LICENSE
+  contact:
+    name: meodai
+    url: https://elastiq.ch/
+    email: color-name-api@elastiq.click
+servers:
+  - url: https://api.color.pizza/
+    description: Production server
+externalDocs:
+  description: HTML documentation for this API
+  url: https://api.color.pizza/v1/docs/
+components:
+  schemas:
+    listDescription:
+      type: object
+      properties:
+        title:
+          type: string
+          description: The title of the color name list
+        description:
+          type: string
+          description: A description of the color name list
+        url:
+          type: string
+          description: API endpoint to get the colors of the list
+        source:
+          type: string
+          description: URL to the source of the color name list
+        key:
+          type: string
+          description: Reference key of the color name list in the API
+        license:
+          type: string
+          description: License of the given color name list
+        colorCount:
+          type: integer
+          description: Amount of colors in the list
+
+    colorBasic:
+      type: object
+      title: ColorBasic
+      required:
+        - name
+        - hex
+        - rgb
+        - hsl
+        - lab
+        - luminance
+        - luminanceWCAG
+        - swatchImg
+      properties:
+        name:
+          type: string
+          description: Name of the closest color relative to the hex value provided
+          minLength: 1
+        hex:
+          type: string
+          description: Hex value of the color (can differ from the requested hex value)
+          pattern: '^#?([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$'
+        rgb:
+          type: object
+          title: RGB
+          description: RGB values
+          required: [r, g, b]
+          properties:
+            r:
+              type: integer
+              minimum: 0
+              maximum: 255
+            g:
+              type: integer
+              minimum: 0
+              maximum: 255
+            b:
+              type: integer
+              minimum: 0
+              maximum: 255
+        hsl:
+          type: object
+          title: HSL
+          description: HSL values. All percentages are represented as integers (e.g., 50% as `50`).
+          required: [h, s, l]
+          properties:
+            h:
+              type: number
+              minimum: 0
+              maximum: 360
+            s:
+              type: number
+              minimum: 0
+              maximum: 100
+            l:
+              type: number
+              minimum: 0
+              maximum: 100
+        lab:
+          type: object
+          title: LAB
+          description: LAB values
+          required: [l, a, b]
+          properties:
+            l:
+              type: number
+              minimum: 0
+              maximum: 100
+            a:
+              type: number
+              minimum: -128
+              maximum: 127
+            b:
+              type: number
+              minimum: -128
+              maximum: 127
+        luminance:
+          type: number
+          description: Luminance value
+          minimum: 0
+        luminanceWCAG:
+          type: number
+          description: Luminance value according to WCAG
+          minimum: 0
+        bestContrast:
+          type: string
+          description: The best contrasting color ('black' or 'white') for text on this color
+          enum: [black, white]
+        swatchImg:
+          type: object
+          title: SwatchImage
+          description: SVG representation of the color
+          required: [svgNamed, svg]
+          properties:
+            svgNamed:
+              type: string
+              description: URL to SVG representation of the color with the name
+              format: uri
+            svg:
+              type: string
+              description: URL to SVG representation of the color without the name
+              format: uri
+
+    colorExtension:
+      type: object
+      title: ColorExtension
+      required:
+        - distance
+        - requestedHex
+      properties:
+        requestedHex:
+          type: string
+          description: The hex value that was requested by the user
+        distance:
+          type: number
+          description: The distance between the requested hex value and the closest color (0 = exact match)
+
+    color:
+      title: Color
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/colorBasic'
+        - $ref: '#/components/schemas/colorExtension'
+
+    possibleLists:
+      type: string
+      description: Predefined color lists. Names are case-sensitive.
+      enum:
+        - default
+        - bestOf
+        - short
+        - wikipedia
+        - french
+        - spanish
+        - german
+        - ridgway
+        - risograph
+        - basic
+        - chineseTraditional
+        - html
+        - japaneseTraditional
+        - leCorbusier
+        - nbsIscc
+        - ntc
+        - osxcrayons
+        - ral
+        - sanzoWadaI
+        - thesaurus
+        - werner
+        - windows
+        - x11
+        - xkcd
+
+    socketColorResponse:
+      type: object
+      properties:
+        paletteTitle:
+          type: string
+        list:
+          $ref: '#/components/schemas/possibleLists'
+        colors:
+          type: array
+          items:
+            $ref: '#/components/schemas/colorBasic'
+
+    error:
+      type: object
+      title: Error
+      properties:
+        error:
+          type: object
+          title: ErrorDetails
+          properties:
+            status:
+              type: number
+            message:
+              type: string
+      example:
+        error:
+          status: 404
+          message: 'Not Found'
+
+paths:
+  /:
+    get:
+      operationId: getApiMetadata
+      summary: Get API metadata and discovery information
+      description: |
+        Returns metadata about the API including available endpoints, version information,
+        and links to documentation. This endpoint is useful for API discovery and provides
+        a quick overview of all available endpoints.
+      responses:
+        '200':
+          description: OK - Returns API metadata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: 'Color Name API'
+                  version:
+                    type: string
+                    example: 'v1'
+                  description:
+                    type: string
+                    example: 'API for getting human-friendly names for hex colors'
+                  endpoints:
+                    type: object
+                    properties:
+                      colors:
+                        type: string
+                        example: '/v1/?values=ff0000,00ff00'
+                      colorsByPath:
+                        type: string
+                        example: '/v1/ff0000,00ff00'
+                      names:
+                        type: string
+                        example: '/v1/names/:query'
+                      lists:
+                        type: string
+                        example: '/v1/lists/'
+                      swatch:
+                        type: string
+                        example: '/v1/swatch/?color=ff0000&name=Red'
+                      docs:
+                        type: string
+                        example: '/v1/docs/'
+                      health:
+                        type: string
+                        example: '/health'
+                  documentation:
+                    type: string
+                    example: '/openapi.yaml'
+                  source:
+                    type: string
+                    example: 'https://github.com/meodai/color-name-api'
+              example:
+                name: 'Color Name API'
+                version: 'v1'
+                description: 'API for getting human-friendly names for hex colors'
+                endpoints:
+                  colors: '/v1/?values=ff0000,00ff00'
+                  colorsByPath: '/v1/ff0000,00ff00'
+                  names: '/v1/names/:query'
+                  lists: '/v1/lists/'
+                  swatch: '/v1/swatch/?color=ff0000&name=Red'
+                  docs: '/v1/docs/'
+                  health: '/health'
+                documentation: '/openapi.yaml'
+                source: 'https://github.com/meodai/color-name-api'
+
+  /health:
+    get:
+      operationId: healthCheck
+      summary: Health check endpoint
+      description: |
+        Returns the health status of the API. This endpoint is useful for monitoring,
+        uptime checks, and load balancer health checks. Always returns a 200 status
+        when the API is operational.
+      responses:
+        '200':
+          description: OK - API is healthy and operational
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                    example: 'ok'
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: '2025-12-08T10:30:00.000Z'
+              example:
+                status: 'ok'
+                timestamp: '2025-12-08T10:30:00.000Z'
+
+  /v1/docs/:
+    get:
+      operationId: getDocumentation
+      summary: Get API Documentation
+      description: Serves the static HTML documentation page for the API.
+      responses:
+        '200':
+          description: OK - Returns the HTML documentation page.
+          content:
+            text/html:
+              schema:
+                type: string
+                format: html
+
+  /v1/:
+    get:
+      operationId: getColorNames
+      summary: Get color names for specific hex values
+      description: |
+        Returns an array of colors from the specified list, with distance calculations 
+        to show how close each match is to the requested colors. When providing multiple 
+        values, the endpoint will find the closest match for each color.
+
+        If no colors are provided, returns all colors from the specified list.
+
+        When the server has socket.io enabled, this endpoint will also emit a 'colors' event
+        with the same response data to all connected socket clients.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                title: ColorResponse
+                properties:
+                  colors:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/color'
+                  paletteTitle:
+                    type: string
+                    description: A creatively generated name for the color palette when multiple colors are requested
+              example:
+                paletteTitle: 'Ruby Red'
+                colors:
+                  - name: 'Red'
+                    hex: '#FF0000'
+                    rgb: { r: 255, g: 0, b: 0 }
+                    hsl: { h: 0, s: 100, l: 50 }
+                    lab: { l: 53.24, a: 80.09, b: 67.2 }
+                    luminance: 0.2126
+                    luminanceWCAG: 0.2126
+                    bestContrast: 'white'
+                    distance: 0
+                    requestedHex: '#FF0000'
+                    swatchImg:
+                      svgNamed: '/v1/swatch/?color=ff0000&name=Red'
+                      svg: '/v1/swatch/?color=ff0000'
+
+        '400':
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  status: 400
+                  message: "Invalid or missing list key: 'nonexistent'. Available keys are: default, bestOf, short, ..."
+
+        '404':
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  status: 404
+                  message: "'xyz' is not a valid HEX color"
+
+        '409':
+          description: CONFLICT - Requested more unique colors than available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  status: 409
+                  message: 'Could not find enough unique color names: exhausted all available names'
+                  availableCount: 1500
+                  totalCount: 1500
+                  requestedCount: 1600
+
+    parameters:
+      - name: list
+        in: query
+        description: The name of the color name list to use (case-sensitive)
+        schema:
+          $ref: '#/components/schemas/possibleLists'
+        style: form
+        explode: false
+        required: false
+
+      - name: values
+        in: query
+        description: A comma-separated list of hex values (e.g., `FF0000,00FF00` do not include the `#`)
+        schema:
+          type: string
+        required: false
+
+      - name: noduplicates
+        in: query
+        description: When true, ensures each color gets a unique name even when colors are similar
+        schema:
+          type: boolean
+        required: false
+
+      - name: goodnamesonly
+        in: query
+        description: When true, uses the 'bestOf' list automatically
+        schema:
+          type: boolean
+        required: false
+
+      - name: X-Referrer
+        in: header
+        description: |
+          Custom header for explicit referrer tracking. When provided, this value is used instead of 
+          standard referrer headers and is included in socket.io event data. Useful for attribution
+          and analytics, especially in environments where standard referrer headers might be stripped.
+        required: false
+        schema:
+          type: string
+        example: 'my-app-name'
+
+  /v1/names/:
+    get:
+      operationId: searchColorsByName
+      summary: Search for colors by name
+      description: |
+        Returns colors whose names contain the search string. The search is case-insensitive.
+        The search string must be at least 3 characters long.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                title: ColorNameSearchResponse
+                properties:
+                  colors:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/colorBasic'
+                    description: Array of colors matching the search term
+
+        '404':
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  status: 404
+                  message: 'the color name your are looking for must be at least 3 characters long.'
+
+    parameters:
+      - name: name
+        in: query
+        description: The search term to look for in color names (min 3 characters)
+        schema:
+          type: string
+          minLength: 3
+        style: form
+        explode: false
+        required: false
+
+      - name: list
+        in: query
+        description: The name of the color name list to search in
+        schema:
+          $ref: '#/components/schemas/possibleLists'
+        style: form
+        explode: false
+        required: false
+
+  /v1/lists/:
+    get:
+      operationId: getColorLists
+      summary: Get available color name lists
+      description: |
+        Returns a list of available color name lists with descriptions and URLs to
+        the color list endpoints. If a specific list key is provided via the 'list' query parameter,
+        only the description for that list will be returned.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                title: ColorListsResponse
+                oneOf:
+                  - type: object
+                    title: AllColorLists
+                    properties:
+                      availableColorNameLists:
+                        type: array
+                        items:
+                          type: string
+                        description: Array of all available list keys
+                      listDescriptions:
+                        type: object
+                        title: ListDescriptions
+                        description: Object containing descriptions for each list
+                        properties:
+                          default:
+                            $ref: '#/components/schemas/listDescription'
+                          bestOf:
+                            $ref: '#/components/schemas/listDescription'
+                          # other lists as defined in possibleLists enum
+                  - $ref: '#/components/schemas/listDescription'
+
+        '400':
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  status: 400
+                  message: "Invalid or missing list key: 'nonexistent'. Available keys are: default, bestOf, short, ..."
+
+        '404':
+          description: NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+
+      parameters:
+        - name: list
+          in: query
+          description: The name of a specific color name list to retrieve details for
+          required: false
+          schema:
+            $ref: '#/components/schemas/possibleLists'
+          style: form
+          explode: false
+
+  /v1/swatch/:
+    get:
+      operationId: getColorSwatch
+      summary: Generate a color swatch for any color
+      description: |
+        Generates an SVG swatch representation of a color. The swatch can include 
+        the color name if provided. The SVG is designed to be visually appealing 
+        and readable across different backgrounds.
+      parameters:
+        - name: color
+          in: query
+          description: The hex value of the color to retrieve without '#'
+          schema:
+            type: string
+            pattern: '^[0-9A-Fa-f]{3,6}$'
+          style: form
+          explode: false
+          required: true
+        - name: name
+          in: query
+          description: The name of the color to display on the swatch
+          schema:
+            type: string
+          style: form
+          explode: false
+          required: false
+      responses:
+        '200':
+          description: OK
+          content:
+            image/svg+xml:
+              schema:
+                type: string
+                format: svg
+        '400':
+          description: BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  status: 400
+                  message: 'A valid hex color parameter (without #) is required.'
+
+x-socket-io:
+  version: '4.x'
+  description: |
+    This API supports real-time communication via Socket.io for receiving color data.
+    Socket.io support is conditionally enabled based on server configuration.
+  connection:
+    url: '{server_url}' # Uses the same URL as the HTTP API
+    transports: ['websocket', 'polling']
+  events:
+    - name: colors
+      description: |
+        Emitted when new colors are requested through the HTTP API.
+        This allows clients to see color requests in real-time.
+      payload:
+        $ref: '#/components/schemas/socketColorResponse'
+      direction: server-to-client
+  authentication:
+    required: false
+  cors:
+    enabled: true
+    origins:
+      description: Controlled via ALLOWED_SOCKET_ORIGINS environment variable
+      default: ['http://localhost:8080']
+
+x-api-features:
+  compression:
+    gzip:
+      supported: true
+      description: |
+        The API automatically detects if the client accepts gzip compression
+        and will send compressed responses when possible.
+  caching:
+    supported: true
+    description: |
+      The API uses LRU caching for gzipped responses to improve performance
+      for frequently requested data.
+  custom-headers:
+    x-referrer:
+      name: X-Referrer
+      description: |
+        Custom header for explicit referrer tracking. When provided, this value is used instead of 
+        standard referrer headers and is included in socket.io event data. Useful for attribution
+        and analytics, especially in environments where standard referrer headers might be stripped.
+      in: header
+      required: false
+      schema:
+        type: string
+      example: 'my-app-name'

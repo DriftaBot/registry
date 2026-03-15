@@ -9,6 +9,7 @@ export default defineConfig({
     nav: [
       { text: 'Guide', link: '/how-it-works' },
       { text: 'Engine ↗', link: 'https://driftabot.github.io/engine', target: '_blank' },
+      { text: 'Agent ↗', link: 'https://github.com/marketplace/actions/driftabot-agent', target: '_blank' },
       { text: 'GitHub', link: 'https://github.com/DriftaBot/specs' },
     ],
 

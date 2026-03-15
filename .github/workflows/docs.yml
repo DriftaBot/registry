@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - 'docs/**'
+      - 'companies/**'
+      - 'provider.companies.yaml'
     tags:
       - 'v*.*.*'        # triggered by make release
   workflow_dispatch:

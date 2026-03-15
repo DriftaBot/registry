@@ -10,7 +10,7 @@ The trade-off: dynamic discovery is subject to the 20-repo cap and relies on Cod
 
 ## Opt-in registry (recommended)
 
-Register your repo in [`consumer.companies.yaml`](https://github.com/DriftaBot/specs/blob/main/consumer.companies.yaml) to receive notifications unconditionally:
+Register your repo in [`consumer.companies.yaml`](https://github.com/DriftaBot/registry/blob/main/consumer.companies.yaml) to receive notifications unconditionally:
 
 - **No cap** — registered repos are always notified regardless of the 20-repo limit
 - **No false negatives** — you won't be missed if Code Search doesn't match your import style

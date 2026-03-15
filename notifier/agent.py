@@ -56,7 +56,7 @@ those APIs by creating clear, actionable GitHub issues.
 | **Location** | `<location>` |
 | **Severity** | Breaking |
 
-**Spec:** [<spec_path>](https://github.com/DriftaBot/specs/blob/<commit_sha>/<spec_path>)
+**Spec:** [<spec_path>](https://github.com/DriftaBot/registry/blob/<commit_sha>/<spec_path>)
 
 ### Files referencing this endpoint
 <bullet list of matched_files from check_consumer_usage, or "_(no specific files identified)_">
@@ -66,7 +66,7 @@ those APIs by creating clear, actionable GitHub issues.
 2. Check the <Company> API changelog for migration guidance.
 
 ---
-*Created by [DriftaBot](https://github.com/DriftaBot/specs) · If this is a false positive, close the issue.*
+*Created by [DriftaBot](https://github.com/DriftaBot/registry) · If this is a false positive, close the issue.*
 ```
 
 Use `commit_sha` and `path` from the `get_changed_specs` result to build the spec link.

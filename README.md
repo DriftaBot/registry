@@ -4,7 +4,7 @@ The central, always-up-to-date repository for public API specifications from maj
 
 Specs are automatically fetched every 6 hours and diffed for breaking changes. Affected consumer repositories are notified via GitHub issues.
 
-**[→ Full documentation](https://driftabot.github.io/specs/)**
+**[→ Full documentation](https://driftabot.github.io/registry/)**
 
 ## Spec Directory
 
@@ -29,10 +29,10 @@ companies/
 
 | Task | Link |
 |------|------|
-| Add an API provider | [docs/providers](https://driftabot.github.io/specs/providers) |
-| Register for notifications | [docs/consumers](https://driftabot.github.io/specs/consumers) |
-| Check a repo for API issues | [docs/check-consumer](https://driftabot.github.io/specs/check-consumer) |
-| Run locally | [docs/local-dev](https://driftabot.github.io/specs/local-dev) |
+| Add an API provider | [docs/providers](https://driftabot.github.io/registry/providers) |
+| Register for notifications | [docs/consumers](https://driftabot.github.io/registry/consumers) |
+| Check a repo for API issues | [docs/check-consumer](https://driftabot.github.io/registry/check-consumer) |
+| Run locally | [docs/local-dev](https://driftabot.github.io/registry/local-dev) |
 
 ## GitHub Policy Compliance
 

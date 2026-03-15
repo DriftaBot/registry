@@ -10,7 +10,7 @@
 
 ```bash
 # Clone the repo
-git clone https://github.com/DriftaBot/specs.git
+git clone https://github.com/DriftaBot/registry.git
 cd specs
 
 # Install Python dependencies

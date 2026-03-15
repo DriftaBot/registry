@@ -8,8 +8,8 @@ DriftaBot Specs has two automated pipelines: a **crawler** that keeps specs up t
 provider.companies.yaml  →  crawl-specs workflow  →  companies/providers/
 ```
 
-1. [`provider.companies.yaml`](https://github.com/DriftaBot/specs/blob/main/provider.companies.yaml) maps each company to the GitHub repo and file path(s) where their spec lives.
-2. The [`crawl-specs`](https://github.com/DriftaBot/specs/blob/main/.github/workflows/crawl-specs.yml) workflow runs on a schedule every 6 hours.
+1. [`provider.companies.yaml`](https://github.com/DriftaBot/registry/blob/main/provider.companies.yaml) maps each company to the GitHub repo and file path(s) where their spec lives.
+2. The [`crawl-specs`](https://github.com/DriftaBot/registry/blob/main/.github/workflows/crawl-specs.yml) workflow runs on a schedule every 6 hours.
 3. **Cost optimisation** — at midnight UTC the workflow uses a LangGraph ReAct agent powered by Claude. The other three daily runs use a fast deterministic crawler with no LLM cost.
 4. Each spec is fetched, SHA-256 hashed, and compared with the stored version. Changed specs are written and committed.
 
@@ -19,11 +19,11 @@ provider.companies.yaml  →  crawl-specs workflow  →  companies/providers/
 companies/providers/ commit  →  notify-consumers workflow  →  GitHub issues
 ```
 
-1. Every push that changes files under `companies/providers/` (excluding `drift/`) triggers the [`notify-consumers`](https://github.com/DriftaBot/specs/blob/main/.github/workflows/notify-consumers.yml) workflow.
+1. Every push that changes files under `companies/providers/` (excluding `drift/`) triggers the [`notify-consumers`](https://github.com/DriftaBot/registry/blob/main/.github/workflows/notify-consumers.yml) workflow.
 2. The [driftabot/engine](https://driftabot.github.io/engine) CLI diffs the new spec against the previous commit.
 3. Drift results are written to `companies/providers/<company>/drift/` for every run.
 4. GitHub Code Search finds public repos that import the affected company's client libraries (capped at 20 per company).
-5. Repos in [`consumer.companies.yaml`](https://github.com/DriftaBot/specs/blob/main/consumer.companies.yaml) are always included regardless of the cap.
+5. Repos in [`consumer.companies.yaml`](https://github.com/DriftaBot/registry/blob/main/consumer.companies.yaml) are always included regardless of the cap.
 6. For each candidate repo, a second Code Search query checks whether the repo actually references the broken endpoint.
 7. A GitHub issue is opened in each affected repo by [@driftabot-agent](https://github.com/driftabot-agent).
 

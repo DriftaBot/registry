@@ -30,7 +30,7 @@ def _issue_body(
     files_md = "\n".join(f"- `{f}`" for f in matched_files) or "_(no specific files identified)_"
     spec_link = ""
     if spec_path and commit_sha:
-        url = f"https://github.com/DriftaBot/specs/blob/{commit_sha}/{spec_path}"
+        url = f"https://github.com/DriftaBot/registry/blob/{commit_sha}/{spec_path}"
         spec_link = f"\n**Spec:** [{spec_path}]({url})\n"
     method = bc.get('method', '')
     path_str = f"`{bc.get('path', '')}`" + (f" `{method}`" if method else "")
@@ -56,7 +56,7 @@ def _issue_body(
 2. Check the {display_name} API changelog for migration guidance.
 
 ---
-*Created by [DriftaBot](https://github.com/DriftaBot/specs) · If this is a false positive, close the issue.*
+*Created by [DriftaBot](https://github.com/DriftaBot/registry) · If this is a false positive, close the issue.*
 """
 
 

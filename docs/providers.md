@@ -6,7 +6,7 @@ Anyone can add a new API provider by opening a pull request. The crawler will pi
 
 **1. Find the provider's public GitHub repo** that contains their API spec (OpenAPI, GraphQL, or gRPC).
 
-**2. Add an entry to [`provider.companies.yaml`](https://github.com/DriftaBot/specs/blob/main/provider.companies.yaml):**
+**2. Add an entry to [`provider.companies.yaml`](https://github.com/DriftaBot/registry/blob/main/provider.companies.yaml):**
 
 ```yaml
 - name: acme                          # unique slug (lowercase, no spaces)

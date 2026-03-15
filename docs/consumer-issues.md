@@ -26,7 +26,7 @@ When a breaking change is detected and a consumer repo is found to reference the
 | **Location** | `response.body.email` |
 | **Severity** | Breaking |
 
-**Spec:** [companies/providers/stripe/openapi/stripe.openapi.json](https://github.com/DriftaBot/specs/blob/<sha>/companies/providers/stripe/openapi/stripe.openapi.json)
+**Spec:** [companies/providers/stripe/openapi/stripe.openapi.json](https://github.com/DriftaBot/registry/blob/<sha>/companies/providers/stripe/openapi/stripe.openapi.json)
 
 ### Files referencing this endpoint
 - `src/billing/client.py`
@@ -37,7 +37,7 @@ When a breaking change is detected and a consumer repo is found to reference the
 2. Check the Stripe API changelog for migration guidance.
 
 ---
-*Created by [DriftaBot](https://github.com/DriftaBot/specs) · If this is a false positive, close the issue.*
+*Created by [DriftaBot](https://github.com/DriftaBot/registry) · If this is a false positive, close the issue.*
 ```
 
 ## Labels

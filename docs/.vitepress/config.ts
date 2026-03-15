@@ -3,14 +3,14 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'DriftaBot Specs',
   description: 'The central, always-up-to-date repository for public API specifications — with automatic breaking change detection and consumer notifications.',
-  base: '/specs/',
+  base: '/registry/',
 
   themeConfig: {
     nav: [
       { text: 'Guide', link: '/how-it-works' },
       { text: 'Engine ↗', link: 'https://driftabot.github.io/engine', target: '_blank' },
       { text: 'Agent ↗', link: 'https://github.com/marketplace/actions/driftabot-agent', target: '_blank' },
-      { text: 'GitHub', link: 'https://github.com/DriftaBot/specs' },
+      { text: 'GitHub', link: 'https://github.com/DriftaBot/registry' },
     ],
 
     sidebar: [
@@ -44,7 +44,7 @@ export default defineConfig({
     ],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/DriftaBot/specs' },
+      { icon: 'github', link: 'https://github.com/DriftaBot/registry' },
     ],
 
     footer: {

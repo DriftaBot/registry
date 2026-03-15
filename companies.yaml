@@ -6,6 +6,13 @@ companies:
         repo: stripe/openapi
         path: openapi/spec3.json
         output: companies/stripe/openapi/stripe.openapi.json
+    consumers:
+      - query: "stripe language:python"
+      - query: "from stripe import language:python"
+      - query: "require(\"stripe\") language:javascript"
+      - query: "from 'stripe' language:typescript"
+      - query: "github.com/stripe/stripe-go language:go"
+      - query: "Stripe::StripeClient language:ruby"
 
   - name: twilio
     display_name: Twilio
@@ -15,6 +22,12 @@ companies:
         # Fetch all JSON spec files in the directory
         path_pattern: spec/json
         output_dir: companies/twilio/openapi/
+    consumers:
+      - query: "twilio language:python"
+      - query: "from twilio.rest import language:python"
+      - query: "require(\"twilio\") language:javascript"
+      - query: "github.com/twilio/twilio-go language:go"
+      - query: "Twilio::REST language:ruby"
 
   - name: github
     display_name: GitHub
@@ -23,6 +36,12 @@ companies:
         repo: github/rest-api-description
         path: descriptions/api.github.com/api.github.com.json
         output: companies/github/openapi/github.openapi.json
+    consumers:
+      - query: "from github import Github language:python"
+      - query: "PyGithub language:python"
+      - query: "require(\"@octokit/rest\") language:javascript"
+      - query: "from '@octokit/rest' language:typescript"
+      - query: "github.com/google/go-github language:go"
 
   - name: slack
     display_name: Slack
@@ -31,6 +50,12 @@ companies:
         repo: slackapi/slack-api-specs
         path: web-api/slack_web_openapi_v2.json
         output: companies/slack/openapi/slack.openapi.json
+    consumers:
+      - query: "from slack_sdk import language:python"
+      - query: "slack_sdk language:python"
+      - query: "require(\"@slack/web-api\") language:javascript"
+      - query: "from '@slack/web-api' language:typescript"
+      - query: "github.com/slack-go/slack language:go"
 
   - name: sendgrid
     display_name: SendGrid
@@ -39,6 +64,12 @@ companies:
         repo: twilio/sendgrid-oai
         path_pattern: spec/json
         output_dir: companies/sendgrid/openapi/
+    consumers:
+      - query: "sendgrid language:python"
+      - query: "from sendgrid import language:python"
+      - query: "require(\"@sendgrid/mail\") language:javascript"
+      - query: "from '@sendgrid/mail' language:typescript"
+      - query: "github.com/sendgrid/sendgrid-go language:go"
 
   - name: digitalocean
     display_name: DigitalOcean
@@ -47,6 +78,11 @@ companies:
         repo: digitalocean/openapi
         path: specification/DigitalOcean-public.v2.yaml
         output: companies/digitalocean/openapi/digitalocean.openapi.yaml
+    consumers:
+      - query: "python-digitalocean language:python"
+      - query: "import digitalocean language:python"
+      - query: "require(\"do-wrapper\") language:javascript"
+      - query: "github.com/digitalocean/godo language:go"
 
   - name: netlify
     display_name: Netlify
@@ -55,6 +91,11 @@ companies:
         repo: netlify/open-api
         path: swagger.yml
         output: companies/netlify/openapi/netlify.openapi.yaml
+    consumers:
+      - query: "netlify-cli language:javascript"
+      - query: "require(\"netlify\") language:javascript"
+      - query: "from netlify import language:python"
+      - query: "github.com/netlify/open-api language:go"
 
   - name: pagerduty
     display_name: PagerDuty
@@ -63,6 +104,11 @@ companies:
         repo: PagerDuty/api-schema
         path: REST/openapiv3.json
         output: companies/pagerduty/openapi/pagerduty.openapi.json
+    consumers:
+      - query: "pdpyras language:python"
+      - query: "from pdpyras import language:python"
+      - query: "require(\"node-pagerduty\") language:javascript"
+      - query: "github.com/PagerDuty/go-pagerduty language:go"
 
   - name: shopify
     display_name: Shopify
@@ -73,6 +119,11 @@ companies:
         # This entry is a placeholder; update path once a canonical SDL source is confirmed.
         path: README.md
         output: companies/shopify/graphql/.keep
+    consumers:
+      - query: "shopify language:python"
+      - query: "from shopify import language:python"
+      - query: "require(\"shopify-api-node\") language:javascript"
+      - query: "github.com/bold-commerce/go-shopify language:go"
 
   - name: google
     display_name: Google
@@ -82,3 +133,8 @@ companies:
         # Fetch all proto files for the Pub/Sub v1 API as an example
         path_pattern: google/pubsub/v1
         output_dir: companies/google/grpc/pubsub_v1/
+    consumers:
+      - query: "google-cloud-pubsub language:python"
+      - query: "from google.cloud import pubsub language:python"
+      - query: "require(\"@google-cloud/pubsub\") language:javascript"
+      - query: "cloud.google.com/go/pubsub language:go"

@@ -17,10 +17,15 @@ class SpecConfig(BaseModel):
     output_dir: Optional[str] = None    # output directory for path_pattern results
 
 
+class ConsumerConfig(BaseModel):
+    query: str  # GitHub Code Search query string
+
+
 class CompanyConfig(BaseModel):
     name: str
     display_name: str
     specs: List[SpecConfig]
+    consumers: List[ConsumerConfig] = []
 
 
 class CompaniesRegistry(BaseModel):

@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 REPO_ROOT = Path(__file__).parent.parent
 COMPANIES_YAML = REPO_ROOT / "companies.yaml"
-CONSUMERS_YAML = REPO_ROOT / "consumers.yaml"
+CONSUMERS_YAML = REPO_ROOT / "companies" / "consumers.yaml"
 
 
 class SpecConfig(BaseModel):

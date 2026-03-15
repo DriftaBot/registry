@@ -30,7 +30,7 @@ companies' public GitHub repositories.
    - How many errored (with company name and error message)
 
 ## Important rules
-- Only write files under the `companies/` directory.
+- Only write files under the `companies/providers/` directory.
 - Do not read or display spec file contents — `sync_spec` handles fetch+compare+write internally.
 """
 

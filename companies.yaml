@@ -5,7 +5,7 @@ companies:
       - type: openapi
         repo: stripe/openapi
         path: openapi/spec3.json
-        output: companies/stripe/openapi/stripe.openapi.json
+        output: companies/providers/stripe/openapi/stripe.openapi.json
     consumers:
       - query: "stripe language:python"
       - query: "from stripe import language:python"
@@ -21,7 +21,7 @@ companies:
         repo: twilio/twilio-oai
         # Fetch all JSON spec files in the directory
         path_pattern: spec/json
-        output_dir: companies/twilio/openapi/
+        output_dir: companies/providers/twilio/openapi/
     consumers:
       - query: "twilio language:python"
       - query: "from twilio.rest import language:python"
@@ -35,7 +35,7 @@ companies:
       - type: openapi
         repo: github/rest-api-description
         path: descriptions/api.github.com/api.github.com.json
-        output: companies/github/openapi/github.openapi.json
+        output: companies/providers/github/openapi/github.openapi.json
     consumers:
       - query: "from github import Github language:python"
       - query: "PyGithub language:python"
@@ -49,7 +49,7 @@ companies:
       - type: openapi
         repo: slackapi/slack-api-specs
         path: web-api/slack_web_openapi_v2.json
-        output: companies/slack/openapi/slack.openapi.json
+        output: companies/providers/slack/openapi/slack.openapi.json
     consumers:
       - query: "from slack_sdk import language:python"
       - query: "slack_sdk language:python"
@@ -63,7 +63,7 @@ companies:
       - type: openapi
         repo: twilio/sendgrid-oai
         path_pattern: spec/json
-        output_dir: companies/sendgrid/openapi/
+        output_dir: companies/providers/sendgrid/openapi/
     consumers:
       - query: "sendgrid language:python"
       - query: "from sendgrid import language:python"
@@ -77,7 +77,7 @@ companies:
       - type: openapi
         repo: digitalocean/openapi
         path: specification/DigitalOcean-public.v2.yaml
-        output: companies/digitalocean/openapi/digitalocean.openapi.yaml
+        output: companies/providers/digitalocean/openapi/digitalocean.openapi.yaml
     consumers:
       - query: "python-digitalocean language:python"
       - query: "import digitalocean language:python"
@@ -90,7 +90,7 @@ companies:
       - type: openapi
         repo: netlify/open-api
         path: swagger.yml
-        output: companies/netlify/openapi/netlify.openapi.yaml
+        output: companies/providers/netlify/openapi/netlify.openapi.yaml
     consumers:
       - query: "netlify-cli language:javascript"
       - query: "require(\"netlify\") language:javascript"
@@ -103,7 +103,7 @@ companies:
       - type: openapi
         repo: PagerDuty/api-schema
         path: REST/openapiv3.json
-        output: companies/pagerduty/openapi/pagerduty.openapi.json
+        output: companies/providers/pagerduty/openapi/pagerduty.openapi.json
     consumers:
       - query: "pdpyras language:python"
       - query: "from pdpyras import language:python"
@@ -118,7 +118,7 @@ companies:
         # NOTE: Shopify's production GraphQL SDL is not publicly committed to GitHub.
         # This entry is a placeholder; update path once a canonical SDL source is confirmed.
         path: README.md
-        output: companies/shopify/graphql/.keep
+        output: companies/providers/shopify/graphql/.keep
     consumers:
       - query: "shopify language:python"
       - query: "from shopify import language:python"
@@ -132,7 +132,7 @@ companies:
         repo: googleapis/googleapis
         # Fetch all proto files for the Pub/Sub v1 API as an example
         path_pattern: google/pubsub/v1
-        output_dir: companies/google/grpc/pubsub_v1/
+        output_dir: companies/providers/google/grpc/pubsub_v1/
     consumers:
       - query: "google-cloud-pubsub language:python"
       - query: "from google.cloud import pubsub language:python"

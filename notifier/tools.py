@@ -87,7 +87,7 @@ def get_changed_specs_plain() -> list[dict]:
     metadata for each changed spec file. Returns [] on first commit or no changes.
     """
     result = subprocess.run(
-        ["git", "diff", "HEAD~1", "HEAD", "--name-only", "--", "companies/"],
+        ["git", "diff", "HEAD~1", "HEAD", "--name-only", "--", "companies/providers/"],
         cwd=str(REPO_ROOT),
         capture_output=True,
         text=True,
@@ -103,11 +103,11 @@ def get_changed_specs_plain() -> list[dict]:
         line = line.strip()
         if not line:
             continue
-        parts = Path(line).parts  # ('companies', 'stripe', 'openapi', 'stripe.openapi.json')
-        if len(parts) < 3:
+        parts = Path(line).parts  # ('companies', 'providers', 'stripe', 'openapi', 'stripe.openapi.json')
+        if len(parts) < 4:
             continue
-        company_name = parts[1]
-        spec_type = parts[2]
+        company_name = parts[2]
+        spec_type = parts[3]
         display = company_map[company_name].display_name if company_name in company_map else company_name
         changed.append({
             "path": line,

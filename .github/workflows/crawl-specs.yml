@@ -1,9 +1,7 @@
 name: Crawl API Specs
 
 on:
-  schedule:
-    - cron: '0 */6 * * *'   # every 6 hours at :00 (00:00, 06:00, 12:00, 18:00 UTC)
-  workflow_dispatch:          # manual trigger for testing
+  workflow_dispatch:
 
 permissions:
   contents: write             # required to push spec updates back to the repo
@@ -25,22 +23,10 @@ jobs:
       - name: Install dependencies
         run: pip install -e .
 
-      - name: Determine run mode
-        id: mode
-        run: |
-          # Use the LangGraph agent once per day (at midnight UTC); all other
-          # runs use the fast deterministic crawler to save Anthropic API costs.
-          HOUR=$(date -u +%H)
-          if [ "$HOUR" = "00" ]; then
-            echo "use_agent=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "use_agent=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Run crawler agent
+      - name: Run crawler
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ANTHROPIC_API_KEY: ${{ steps.mode.outputs.use_agent == 'true' && secrets.ANTHROPIC_API_KEY || '' }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: python -m crawler
 
       - name: Commit updated specs
@@ -51,12 +37,10 @@ jobs:
           git config user.email "crawler@driftabot.dev"
           git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/DriftaBot/registry.git"
           git add companies/
-          # Always produce a commit to prevent the scheduled workflow from
-          # being auto-disabled after 60 days of no repository activity.
           if git diff --staged --quiet; then
-            git commit --allow-empty -m "chore: crawl run $(date -u +%Y-%m-%dT%H:%M:%SZ) [no changes]"
+            echo "No spec changes."
           else
             git commit -m "chore: update specs $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            git pull --rebase
+            git push
           fi
-          git pull --rebase
-          git push

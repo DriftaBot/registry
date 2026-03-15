@@ -7,11 +7,9 @@ Sources:
 
 Output: companies/discovery/candidates.json  (committed for human review).
 """
-import json
 import os
 import re
 import time
-from datetime import datetime
 
 import httpx
 
@@ -40,7 +38,6 @@ _TOPIC_SPEC_TYPE: dict[str, str] = (
 )
 _ALL_TOPICS = list(_TOPIC_SPEC_TYPE)
 
-_OUTPUT = REPO_ROOT / "companies" / "discovery" / "candidates.json"
 
 
 # ---------------------------------------------------------------------------
@@ -386,26 +383,10 @@ def run() -> None:
 
     top = per_type["openapi"] + per_type["graphql"] + per_type["grpc"]
     total = sum(len(b) for b in per_type.values())
-    print(f"\nTotal new candidates: {len(deduped)}, saving {total}"
+    print(f"\nTotal new candidates: {len(deduped)}"
           f" (openapi={len(per_type['openapi'])},"
           f" graphql={len(per_type['graphql'])},"
           f" grpc={len(per_type['grpc'])})")
-
-    _OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    _OUTPUT.write_text(
-        json.dumps(
-            {
-                "discovered_at":   datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
-                "known_providers": len(registry.companies),
-                "candidate_count": len(deduped),
-                "by_type": {t: len(b) for t, b in per_type.items()},
-                "candidates":      top,
-            },
-            indent=2,
-        )
-        + "\n"
-    )
-    print(f"Saved → {_OUTPUT.relative_to(REPO_ROOT)}")
 
     # Download specs and register new providers (APIs.guru candidates only)
     added = save_new_providers(top, known)

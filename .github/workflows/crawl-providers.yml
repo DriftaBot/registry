@@ -1,4 +1,4 @@
-name: Crawl API Specs
+name: Crawl Providers
 
 on:
   schedule:

@@ -16,7 +16,7 @@ cd registry
 # Install Python dependencies
 pip install -e .
 
-# Install the DriftaBot engine (used by crawl-specs)
+# Install the DriftaBot engine (used by crawl-providers)
 npm install -g @driftabot/engine
 
 # Copy and fill in your tokens
@@ -80,7 +80,7 @@ See [Check Your Repo](check-consumer) for full documentation.
 
 | Workflow | Schedule | Description |
 |----------|----------|-------------|
-| `crawl-specs.yml` | Daily 00:00 UTC | Fetches and commits updated provider specs; runs `@driftabot/engine` diff |
+| `crawl-providers.yml` | Daily 00:00 UTC | Fetches and commits updated provider specs; runs `@driftabot/engine` diff |
 | `discover-providers.yml` | Mondays 09:00 UTC | Discovers new API providers, updates `provider.companies.yaml` |
 | `discover-consumers.yml` | Daily 02:00 UTC | Finds new consumer repos, checks and registers them |
 | `scan-consumers.yml` | Daily 04:00 UTC | Scans all registered consumers, writes pass/fail results |

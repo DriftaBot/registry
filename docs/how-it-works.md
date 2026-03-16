@@ -8,7 +8,7 @@ DriftaBot Registry runs five automated GitHub Actions workflows that keep provid
 provider.companies.yaml
         │
         ▼
-crawl-specs (daily 00:00 UTC)
+crawl-providers (daily 00:00 UTC)
   python -m crawler
   @driftabot/engine diff
         │
@@ -32,7 +32,7 @@ scan-consumers (daily 04:00 UTC)
         └─► companies/consumers/pass|fail/
 ```
 
-## 1. crawl-specs (daily 00:00 UTC)
+## 1. crawl-providers (daily 00:00 UTC)
 
 1. [`provider.companies.yaml`](https://github.com/DriftaBot/registry/blob/main/provider.companies.yaml) maps each company to the GitHub repo and file path(s) where their spec lives.
 2. `python -m crawler` fetches each spec and commits any changes to `companies/providers/`.

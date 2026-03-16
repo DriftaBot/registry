@@ -8,7 +8,7 @@ from checker.__main__ import check as check_repo
 from crawler.config import load_consumer_registry, load_registry, register_consumer
 from notifier.tools import search_consumer_repos_plain
 
-_MAX_REPOS = 20  # hard cap on total repos checked per run
+_MAX_DISCOVER_REPOS = 20  # cap for open-ended GitHub discovery only
 
 
 def run_discover() -> None:
@@ -19,8 +19,8 @@ def run_discover() -> None:
 
     checked = 0
     for cfg in registry.companies:
-        if checked >= _MAX_REPOS:
-            print(f"Run cap reached ({_MAX_REPOS} repos). Stopping.")
+        if checked >= _MAX_DISCOVER_REPOS:
+            print(f"Run cap reached ({_MAX_DISCOVER_REPOS} repos). Stopping.")
             break
         repos = search_consumer_repos_plain(cfg.name)
         new_repos = [r for r in repos if r["full_name"] not in known]
@@ -28,8 +28,8 @@ def run_discover() -> None:
             continue
         print(f"\n[discover] {cfg.display_name}: {len(new_repos)} new candidate(s)")
         for repo in new_repos:
-            if checked >= _MAX_REPOS:
-                print(f"Run cap reached ({_MAX_REPOS} repos). Stopping.")
+            if checked >= _MAX_DISCOVER_REPOS:
+                print(f"Run cap reached ({_MAX_DISCOVER_REPOS} repos). Stopping.")
                 break
             print(f"  Checking {repo['full_name']}...")
             issues_found = check_repo(repo["full_name"], cfg.name, raise_issue=True)
@@ -44,7 +44,7 @@ def run_discover() -> None:
 
 
 def run_scan() -> None:
-    """Check all registered consumers against current provider specs; write pass/fail results."""
+    """Check all registered consumers against current provider specs (no cap)."""
     consumer_registry = load_consumer_registry()
     if not consumer_registry.consumers:
         print("No registered consumers. Done.")
@@ -53,9 +53,6 @@ def run_scan() -> None:
     checked = 0
     for entry in consumer_registry.consumers:
         for company in entry.companies:
-            if checked >= _MAX_REPOS:
-                print(f"Run cap reached ({_MAX_REPOS} repos). Stopping.")
-                return
             print(f"  {entry.repo} → {company}")
             check_repo(entry.repo, company, raise_issue=True)
             checked += 1

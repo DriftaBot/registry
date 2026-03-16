@@ -20,8 +20,8 @@ _DISCOVER_PROMPT = (
     "registered in consumer.companies.yaml. "
     "For each company, call search_consumer_repos to find candidates with >=100 stars "
     "that are not already registered. "
-    "For each new candidate, call check_consumer_repo. "
-    "If issues are found, register the repo and raise a GitHub issue. "
+    "For each new candidate, call check_consumer_repo to scan it and write pass/fail results, "
+    "then register the repo regardless of whether issues were found. "
     "Process all companies. Print a summary at the end."
 )
 

@@ -1,7 +1,7 @@
 """
 Deterministic consumer notifier — no LLM required.
 
-run_discover() — find new consumer repos (>=100 stars), check them, register if issues found.
+run_discover() — find new consumer repos (>=100 stars), scan them, register all, write pass/fail.
 run_scan()     — check all registered consumers, write pass/fail to companies/consumers/.
 """
 from checker.__main__ import check as check_repo
@@ -12,7 +12,7 @@ _MAX_DISCOVER_REPOS = 20  # cap for open-ended GitHub discovery only
 
 
 def run_discover() -> None:
-    """Discover new consumer repos not yet in consumer.companies.yaml and check them."""
+    """Discover new consumer repos, scan each one, register all, write pass/fail."""
     registry = load_registry()
     consumer_registry = load_consumer_registry()
     known: set[str] = {entry.repo for entry in consumer_registry.consumers}
@@ -32,13 +32,10 @@ def run_discover() -> None:
                 print(f"Run cap reached ({_MAX_DISCOVER_REPOS} repos). Stopping.")
                 break
             print(f"  Checking {repo['full_name']}...")
-            issues_found = check_repo(repo["full_name"], cfg.name, raise_issue=True)
+            check_repo(repo["full_name"], cfg.name, raise_issue=True)
             checked += 1
-            if issues_found:
-                register_consumer(repo["full_name"], cfg.name)
-                known.add(repo["full_name"])
-            else:
-                print(f"  [skip] {repo['full_name']} — no issues detected")
+            register_consumer(repo["full_name"], cfg.name)
+            known.add(repo["full_name"])
 
     print(f"\nDiscover done — repos checked: {checked}")
 

@@ -14,48 +14,6 @@ The central, always-up-to-date repository for public API specifications from maj
 | `scan-consumers` | Daily 04:00 UTC | Scans all registered consumers in `consumer.companies.yaml` against provider specs, writes results to `companies/consumers/pass\|fail` |
 | `docs` | On push to `main` | Rebuilds GitHub Pages |
 
-## Quick Start
-
-| Task | Link |
-|------|------|
-| Add an API provider | [docs/providers](https://driftabot.github.io/registry/providers) |
-| Register a consumer repo | [docs/consumers](https://driftabot.github.io/registry/consumers) |
-| Check a repo for API issues | [docs/check-consumer](https://driftabot.github.io/registry/check-consumer) |
-| Run locally | [docs/local-dev](https://driftabot.github.io/registry/local-dev) |
-
-## Local Development
-
-```bash
-make crawl                                        # deterministic crawler — no LLM
-make crawl-agent                                  # LangGraph agent crawler (requires ANTHROPIC_API_KEY)
-make check-consumer REPO=owner/repo COMPANY=stripe
-make add-consumer   REPO=owner/repo COMPANY=stripe
-make raise-issue    REPO=owner/repo COMPANY=stripe
-make release                                      # bump patch version, tag, push
-```
-
-## Directory Structure
-
-```
-companies/
-├── providers/
-│   ├── stripe/openapi/          current spec files
-│   ├── twilio/openapi/
-│   ├── github/openapi/
-│   ├── slack/openapi/
-│   ├── sendgrid/openapi/
-│   ├── digitalocean/openapi/
-│   ├── netlify/openapi/
-│   ├── pagerduty/openapi/
-│   ├── shopify/graphql/
-│   └── google/grpc/
-└── consumers/
-    ├── pass/<owner>/<repo>/     scan pass results
-    └── fail/<owner>/<repo>/     scan fail results + issue logs
-drifts/
-└── <org>/<repo>/result.json    spec diff results from @driftabot/engine
-```
-
 ## Secrets Required
 
 | Secret | Used by | Description |

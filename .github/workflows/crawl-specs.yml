@@ -1,10 +1,12 @@
 name: Crawl API Specs
 
 on:
+  schedule:
+    - cron: '0 0 * * *'   # Daily at midnight UTC
   workflow_dispatch:
 
 permissions:
-  contents: write             # required to push spec updates back to the repo
+  contents: write             # required to push spec updates and drift results
 
 jobs:
   crawl:
@@ -20,8 +22,25 @@ jobs:
           python-version: '3.12'
           cache: pip
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: pip install -e .
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install DriftaBot engine
+        run: npm install -g @driftabot/engine
+
+      - name: Snapshot current specs (pre-crawl)
+        run: |
+          # Save the current spec tree so we can diff after crawling
+          if [ -d companies/providers ]; then
+            cp -r companies/providers /tmp/specs-before
+          else
+            mkdir -p /tmp/specs-before
+          fi
 
       - name: Run crawler
         env:
@@ -29,7 +48,72 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: python -m crawler
 
-      - name: Commit updated specs
+      - name: Run spec diff and store drift results
+        run: |
+          set -e
+          mkdir -p drifts
+
+          # Walk every spec that changed
+          find companies/providers -type f \( -name "*.json" -o -name "*.yaml" -o -name "*.yml" -o -name "*.proto" \) | while read NEW_SPEC; do
+            OLD_SPEC="/tmp/specs-before/${NEW_SPEC#companies/providers/}"
+
+            # Skip if this is a brand-new spec (no previous version to compare)
+            [ -f "$OLD_SPEC" ] || continue
+
+            # Skip if the spec hasn't changed
+            diff -q "$OLD_SPEC" "$NEW_SPEC" > /dev/null 2>&1 && continue
+
+            # Derive provider name and determine spec type from path
+            # Path pattern: companies/providers/<name>/<type>/<file>
+            PROVIDER=$(echo "$NEW_SPEC" | awk -F/ '{print $3}')
+            SPEC_TYPE=$(echo "$NEW_SPEC" | awk -F/ '{print $4}')
+
+            # Get the source repo for this provider from provider.companies.yaml
+            REPO=$(python3 - <<PYEOF
+          import yaml, sys
+          with open("provider.companies.yaml") as f:
+              data = yaml.safe_load(f)
+          for c in data.get("companies", []):
+              if c["name"] == "$PROVIDER":
+                  for s in c.get("specs", []):
+                      print(s.get("repo", ""))
+                      sys.exit(0)
+          print("")
+          PYEOF
+          )
+
+          if [ -z "$REPO" ]; then
+            echo "  [skip] No repo found for provider: $PROVIDER"
+            continue
+          fi
+
+          ORG=$(echo "$REPO" | cut -d/ -f1)
+          REPO_NAME=$(echo "$REPO" | cut -d/ -f2)
+          OUT_DIR="drifts/$ORG/$REPO_NAME"
+          mkdir -p "$OUT_DIR"
+
+          echo "  [diff] $PROVIDER ($SPEC_TYPE): $OLD_SPEC → $NEW_SPEC"
+
+          case "$SPEC_TYPE" in
+            openapi)
+              driftabot openapi --base "$OLD_SPEC" --head "$NEW_SPEC" --format json > "$OUT_DIR/result.json" 2>&1 || true
+              ;;
+            graphql)
+              driftabot graphql --base "$OLD_SPEC" --head "$NEW_SPEC" --format json > "$OUT_DIR/result.json" 2>&1 || true
+              ;;
+            grpc)
+              driftabot grpc --base "$OLD_SPEC" --head "$NEW_SPEC" --format json > "$OUT_DIR/result.json" 2>&1 || true
+              ;;
+            *)
+              echo "  [skip] Unknown spec type: $SPEC_TYPE"
+              continue
+              ;;
+          esac
+
+          echo "  [saved] $OUT_DIR/result.json"
+          done
+
+      - name: Commit updated specs and drift results
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -37,10 +121,11 @@ jobs:
           git config user.email "crawler@driftabot.dev"
           git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/DriftaBot/registry.git"
           git add companies/providers/
+          if [ -d drifts ]; then git add drifts/; fi
           if git diff --staged --quiet; then
-            echo "No spec changes."
+            echo "No changes."
           else
-            git commit -m "chore: update provider specs $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            git commit -m "chore: update provider specs and drift results $(date -u +%Y-%m-%dT%H:%M:%SZ)"
             git pull --rebase
             git push
           fi

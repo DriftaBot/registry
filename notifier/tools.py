@@ -193,6 +193,89 @@ def search_consumer_repos_plain(company_name: str) -> list[dict]:
     return repos
 
 
+def close_open_issues_plain(repo: str, company_display: str, token: str | None = None) -> int:
+    """
+    Close any open DriftaBot drift issues for this company on the consumer repo.
+    Posts a resolution comment with badge markdown before closing.
+    Returns count of issues closed.
+    """
+    token = token or os.environ.get("DRIFTABOT_TOKEN", "")
+    if not token:
+        return 0
+    try:
+        issues = _get(
+            f"{GITHUB_API}/repos/{repo}/issues",
+            params={"state": "open", "per_page": 30, "creator": "driftabot-agent"},
+            token=token,
+        )
+    except Exception:
+        return 0
+
+    owner, repo_name = repo.split("/", 1)
+    badge_md = (
+        f"[![DriftaBot](https://img.shields.io/endpoint?url="
+        f"https://raw.githubusercontent.com/DriftaBot/registry/main/"
+        f"companies/consumers/pass/{owner}/{repo_name}/badge.json)]"
+        f"(https://driftabot.github.io/registry/)"
+    )
+    closed = 0
+    for issue in issues:
+        title = issue.get("title", "")
+        if "[DriftaBot]" not in title or company_display not in title:
+            continue
+        number = issue["number"]
+        comment = (
+            f"**DriftaBot re-scanned this repository and found no {company_display} API drift.** "
+            "Your API usage is up-to-date — closing this issue automatically.\n\n"
+            "Add this badge to your README to show your DriftaBot status:\n\n"
+            f"```markdown\n{badge_md}\n```"
+        )
+        try:
+            with httpx.Client(timeout=30) as client:
+                client.post(
+                    f"{GITHUB_API}/repos/{repo}/issues/{number}/comments",
+                    headers=_github_headers(token),
+                    json={"body": comment},
+                )
+                client.patch(
+                    f"{GITHUB_API}/repos/{repo}/issues/{number}",
+                    headers=_github_headers(token),
+                    json={"state": "closed"},
+                )
+            closed += 1
+            print(f"  [resolved] closed #{number}")
+        except Exception as exc:
+            print(f"  [close error] #{number}: {exc}")
+    return closed
+
+
+def notify_pass_plain(repo: str, company_display: str, token: str | None = None) -> bool:
+    """
+    Open a one-time 'All clear' issue with badge markdown on first-time pass.
+    Duplicate-safe via create_issue_plain. Returns True if a new issue was opened.
+    """
+    token = token or os.environ.get("DRIFTABOT_TOKEN", "")
+    if not token:
+        return False
+    owner, repo_name = repo.split("/", 1)
+    badge_md = (
+        f"[![DriftaBot](https://img.shields.io/endpoint?url="
+        f"https://raw.githubusercontent.com/DriftaBot/registry/main/"
+        f"companies/consumers/pass/{owner}/{repo_name}/badge.json)]"
+        f"(https://driftabot.github.io/registry/)"
+    )
+    title = f"[DriftaBot] {company_display} API usage is up-to-date ✓"
+    body = (
+        f"DriftaBot scanned this repository and found no issues with your "
+        f"{company_display} API usage.\n\n"
+        "Add this badge to your README:\n\n"
+        f"```markdown\n{badge_md}\n```\n\n"
+        "DriftaBot will re-scan weekly and open a new issue if drift is detected."
+    )
+    result = create_issue_plain(repo, title, body, token=token)
+    return result["status"] == "created"
+
+
 def create_issue_plain(repo_full_name: str, title: str, body: str, token: str | None = None) -> dict:
     """
     Create a GitHub issue using DRIFTABOT_TOKEN (or the supplied token).

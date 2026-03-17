@@ -257,8 +257,15 @@ def check(repo: str, company: str, raise_issue: bool = False) -> bool:
     if total == 0:
         print(f"Result: No {display} API usage detected in {repo}.")
         if raise_issue:
-            from notifier.tools import log_check_passed
+            from notifier.tools import log_check_passed, close_open_issues_plain, notify_pass_plain
+            token = os.environ.get("DRIFTABOT_TOKEN")
+            owner_p, repo_p = repo.split("/", 1)
+            first_pass = not (REPO_ROOT / "companies" / "consumers" / "pass" / owner_p / repo_p / "status.json").exists()
             log_check_passed(repo, display)
+            if token:
+                closed = close_open_issues_plain(repo, display, token=token)
+                if closed == 0 and first_pass:
+                    notify_pass_plain(repo, display, token=token)
         return False
 
     file_paths = [item["path"] for item in data.get("items", [])]
@@ -307,8 +314,15 @@ def check(repo: str, company: str, raise_issue: bool = False) -> bool:
         if not confirmed_files:
             print(f"Result: No genuine {display} API usage detected in {repo}.")
             if raise_issue:
-                from notifier.tools import log_check_passed
+                from notifier.tools import log_check_passed, close_open_issues_plain, notify_pass_plain
+                token = os.environ.get("DRIFTABOT_TOKEN")
+                owner_p, repo_p = repo.split("/", 1)
+                first_pass = not (REPO_ROOT / "companies" / "consumers" / "pass" / owner_p / repo_p / "status.json").exists()
                 log_check_passed(repo, display)
+                if token:
+                    closed = close_open_issues_plain(repo, display, token=token)
+                    if closed == 0 and first_pass:
+                        notify_pass_plain(repo, display, token=token)
             return False
 
     else:
@@ -372,13 +386,27 @@ def check(repo: str, company: str, raise_issue: bool = False) -> bool:
     elif not used:
         print(f"Result: No {display} API usage detected in {repo}.")
         if raise_issue:
-            from notifier.tools import log_check_passed
+            from notifier.tools import log_check_passed, close_open_issues_plain, notify_pass_plain
+            token = os.environ.get("DRIFTABOT_TOKEN")
+            owner_p, repo_p = repo.split("/", 1)
+            first_pass = not (REPO_ROOT / "companies" / "consumers" / "pass" / owner_p / repo_p / "status.json").exists()
             log_check_passed(repo, display)
+            if token:
+                closed = close_open_issues_plain(repo, display, token=token)
+                if closed == 0 and first_pass:
+                    notify_pass_plain(repo, display, token=token)
     else:
         print(f"Result: OK — {len(used)} resource(s) used, all current.")
         if raise_issue:
-            from notifier.tools import log_check_passed
+            from notifier.tools import log_check_passed, close_open_issues_plain, notify_pass_plain
+            token = os.environ.get("DRIFTABOT_TOKEN")
+            owner_p, repo_p = repo.split("/", 1)
+            first_pass = not (REPO_ROOT / "companies" / "consumers" / "pass" / owner_p / repo_p / "status.json").exists()
             log_check_passed(repo, display)
+            if token:
+                closed = close_open_issues_plain(repo, display, token=token)
+                if closed == 0 and first_pass:
+                    notify_pass_plain(repo, display, token=token)
     return False
 
 

@@ -80,7 +80,7 @@
               <td>{{ c.company }}</td>
               <td>
                 <span :class="['sp-status', 'sp-status--' + c.status]">
-                  {{ c.status === 'passed' ? '✓ Passed' : '✗ Failed' }}
+                  {{ c.status === 'passed' ? '✓' : '✗' }}
                 </span>
               </td>
               <td class="sp-date">{{ c.checkedAt ? formatDate(c.checkedAt) : '—' }}</td>

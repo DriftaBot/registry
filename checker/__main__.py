@@ -259,12 +259,10 @@ def check(repo: str, company: str, raise_issue: bool = False) -> bool:
         if raise_issue:
             from notifier.tools import log_check_passed, close_open_issues_plain, notify_pass_plain
             token = os.environ.get("DRIFTABOT_TOKEN")
-            owner_p, repo_p = repo.split("/", 1)
-            first_pass = not (REPO_ROOT / "companies" / "consumers" / "pass" / owner_p / repo_p / "status.json").exists()
             log_check_passed(repo, display)
             if token:
                 closed = close_open_issues_plain(repo, display, token=token)
-                if closed == 0 and first_pass:
+                if closed == 0:
                     notify_pass_plain(repo, display, token=token)
         return False
 
@@ -316,12 +314,10 @@ def check(repo: str, company: str, raise_issue: bool = False) -> bool:
             if raise_issue:
                 from notifier.tools import log_check_passed, close_open_issues_plain, notify_pass_plain
                 token = os.environ.get("DRIFTABOT_TOKEN")
-                owner_p, repo_p = repo.split("/", 1)
-                first_pass = not (REPO_ROOT / "companies" / "consumers" / "pass" / owner_p / repo_p / "status.json").exists()
                 log_check_passed(repo, display)
                 if token:
                     closed = close_open_issues_plain(repo, display, token=token)
-                    if closed == 0 and first_pass:
+                    if closed == 0:
                         notify_pass_plain(repo, display, token=token)
             return False
 
@@ -388,24 +384,20 @@ def check(repo: str, company: str, raise_issue: bool = False) -> bool:
         if raise_issue:
             from notifier.tools import log_check_passed, close_open_issues_plain, notify_pass_plain
             token = os.environ.get("DRIFTABOT_TOKEN")
-            owner_p, repo_p = repo.split("/", 1)
-            first_pass = not (REPO_ROOT / "companies" / "consumers" / "pass" / owner_p / repo_p / "status.json").exists()
             log_check_passed(repo, display)
             if token:
                 closed = close_open_issues_plain(repo, display, token=token)
-                if closed == 0 and first_pass:
+                if closed == 0:
                     notify_pass_plain(repo, display, token=token)
     else:
         print(f"Result: OK — {len(used)} resource(s) used, all current.")
         if raise_issue:
             from notifier.tools import log_check_passed, close_open_issues_plain, notify_pass_plain
             token = os.environ.get("DRIFTABOT_TOKEN")
-            owner_p, repo_p = repo.split("/", 1)
-            first_pass = not (REPO_ROOT / "companies" / "consumers" / "pass" / owner_p / repo_p / "status.json").exists()
             log_check_passed(repo, display)
             if token:
                 closed = close_open_issues_plain(repo, display, token=token)
-                if closed == 0 and first_pass:
+                if closed == 0:
                     notify_pass_plain(repo, display, token=token)
     return False
 

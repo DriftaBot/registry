@@ -228,7 +228,9 @@ def close_open_issues_plain(repo: str, company_display: str, token: str | None =
             f"**DriftaBot re-scanned this repository and found no {company_display} API drift.** "
             "Your API usage is up-to-date — closing this issue automatically.\n\n"
             "Add this badge to your README to show your DriftaBot status:\n\n"
-            f"```markdown\n{badge_md}\n```"
+            f"```markdown\n{badge_md}\n```\n\n"
+            "---\n"
+            "Opened automatically by [DriftaBot](https://driftabot.github.io/registry/)"
         )
         try:
             with httpx.Client(timeout=30) as client:
@@ -270,7 +272,8 @@ def notify_pass_plain(repo: str, company_display: str, token: str | None = None)
         f"{company_display} API usage.\n\n"
         "Add this badge to your README:\n\n"
         f"```markdown\n{badge_md}\n```\n\n"
-        "DriftaBot will re-scan weekly and open a new issue if drift is detected."
+        "---\n"
+        "Opened automatically by [DriftaBot](https://driftabot.github.io/registry/)"
     )
     result = create_issue_plain(repo, title, body, token=token)
     return result["status"] == "created"

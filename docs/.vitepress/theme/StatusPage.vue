@@ -101,11 +101,10 @@
               <td class="sp-badge-cell">
                 <button
                   class="sp-badge-btn"
-                  :title="copied === c.repo ? 'Copied!' : 'Copy badge markdown'"
+                  :title="copied === c.repo ? 'Copied!' : 'Copy to clipboard'"
                   @click="copyBadge(c)"
                 >
                   <img :src="shieldUrl(c)" alt="DriftaBot badge" height="20" />
-                  <span class="sp-copy-hint">{{ copied === c.repo ? '✓' : 'copy' }}</span>
                 </button>
               </td>
             </tr>
@@ -418,9 +417,5 @@ a.sp-provider-card:hover {
 .sp-badge-btn:hover {
   border-color: var(--vp-c-brand-1);
   background: var(--vp-c-bg-soft);
-}
-.sp-copy-hint {
-  font-size: 0.7rem;
-  color: var(--vp-c-text-3);
 }
 </style>

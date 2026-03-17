@@ -335,7 +335,10 @@ a.sp-provider-card:hover {
   min-width: 780px;
   border-collapse: collapse;
   font-size: 0.85rem;
+  table-layout: fixed;
 }
+.sp-table th:first-child,
+.sp-table td:first-child { width: 30%; }
 .sp-table th {
   text-align: left;
   padding: 0.4rem 0.5rem;

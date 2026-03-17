@@ -6,6 +6,8 @@ export default defineConfig({
   base: '/registry/',
 
   themeConfig: {
+    logo: '/logo.png',
+
     nav: [
       { text: 'Guide', link: '/how-it-works' },
       { text: 'Status', link: '/status' },

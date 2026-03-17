@@ -1,3 +1,5 @@
+<img src="docs/public/logo.png" alt="DriftaBot" width="120">
+
 # DriftaBot Registry
 
 The central, always-up-to-date repository for public API specifications from major companies. Consumer repositories are checked against current provider specs and notified via GitHub issues when their API usage is incorrect or outdated.

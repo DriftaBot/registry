@@ -65,6 +65,7 @@
               <th>Status</th>
               <th>Last checked</th>
               <th>Issues</th>
+              <th>Badge</th>
             </tr>
           </thead>
           <tbody>
@@ -97,6 +98,16 @@
                   >#{{ issueNum(issue.url) }}</a>
                 </span>
               </td>
+              <td class="sp-badge-cell">
+                <button
+                  class="sp-badge-btn"
+                  :title="copied === c.repo ? 'Copied!' : 'Copy badge markdown'"
+                  @click="copyBadge(c)"
+                >
+                  <img :src="shieldUrl(c)" alt="DriftaBot badge" height="20" />
+                  <span class="sp-copy-hint">{{ copied === c.repo ? '✓' : 'copy' }}</span>
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -113,8 +124,9 @@ import type { StatusData } from '../../status.data'
 
 const props = defineProps<{ data: StatusData }>()
 
-const query = ref('')
-const tab   = ref<'all' | 'providers' | 'consumers'>('all')
+const query  = ref('')
+const tab    = ref<'all' | 'providers' | 'consumers'>('all')
+const copied = ref<string | null>(null)
 
 const TABS = computed(() => [
   { id: 'all'       as const, label: 'All',       count: props.data.providers.length + props.data.consumers.length },
@@ -157,6 +169,25 @@ function formatDate(iso: string): string {
 
 function issueNum(url: string): string {
   return url.split('/').pop() ?? '?'
+}
+
+function shieldUrl(c: { repo: string; status: string }): string {
+  const [owner, repo] = c.repo.split('/')
+  const bucket = c.status === 'passed' ? 'pass' : 'fail'
+  const json = `https://raw.githubusercontent.com/DriftaBot/registry/main/companies/consumers/${bucket}/${owner}/${repo}/badge.json`
+  return `https://img.shields.io/endpoint?url=${encodeURIComponent(json)}`
+}
+
+function copyBadge(c: { repo: string; status: string }): void {
+  const [owner, repo] = c.repo.split('/')
+  const bucket = c.status === 'passed' ? 'pass' : 'fail'
+  const json = `https://raw.githubusercontent.com/DriftaBot/registry/main/companies/consumers/${bucket}/${owner}/${repo}/badge.json`
+  const shield = `https://img.shields.io/endpoint?url=${encodeURIComponent(json)}`
+  const md = `[![DriftaBot](${shield})](https://driftabot.github.io/registry/)`
+  navigator.clipboard.writeText(md).then(() => {
+    copied.value = c.repo
+    setTimeout(() => { copied.value = null }, 2000)
+  })
 }
 </script>
 
@@ -370,4 +401,26 @@ a.sp-provider-card:hover {
 .dark .sp-status--failed { background: #450a0a; color: #fca5a5; }
 .dark .sp-issue-link     { background: #451a03; color: #fcd34d !important; border-color: #78350f; }
 .dark .sp-issue-link:hover { background: #78350f; }
+
+/* ── Badge cell ──────────────────────────────────────────────── */
+.sp-badge-cell { white-space: nowrap; }
+.sp-badge-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: none;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 6px;
+  padding: 0.2rem 0.45rem;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.sp-badge-btn:hover {
+  border-color: var(--vp-c-brand-1);
+  background: var(--vp-c-bg-soft);
+}
+.sp-copy-hint {
+  font-size: 0.7rem;
+  color: var(--vp-c-text-3);
+}
 </style>

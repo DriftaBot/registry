@@ -333,10 +333,14 @@ a.sp-provider-card:hover {
 .sp-badge--grpc    { background: #dcfce7; color: #15803d; }
 
 /* ── Consumer table ──────────────────────────────────────────── */
-.sp-table-wrap { overflow-x: auto; }
+.sp-table-wrap {
+  overflow-x: auto;
+  margin: 0 -1.5rem;
+  padding: 0 1.5rem;
+}
 .sp-table {
   width: 100%;
-  min-width: 860px;
+  min-width: 900px;
   border-collapse: collapse;
   font-size: 0.875rem;
 }

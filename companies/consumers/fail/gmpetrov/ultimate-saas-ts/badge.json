@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 1,
+  "label": "DriftaBot",
+  "message": "drift detected",
+  "color": "red"
+}

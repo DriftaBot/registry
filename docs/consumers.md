@@ -47,3 +47,13 @@ Company names must match the `name` field in `provider.companies.yaml` exactly (
 | [ansible-collections/community.general](https://github.com/ansible-collections/community.general) | sendgrid |
 | [auth0/rules](https://github.com/auth0/rules) | sendgrid |
 | [kaansoral/adventureland](https://github.com/kaansoral/adventureland) | stripe |
+
+## Status badge
+
+Once your repo has been scanned, add a live DriftaBot badge to your README:
+
+```markdown
+[![DriftaBot](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/DriftaBot/registry/main/companies/consumers/pass/YOUR-ORG/YOUR-REPO/badge.json)](https://driftabot.github.io/registry/)
+```
+
+Replace `YOUR-ORG/YOUR-REPO` with your GitHub repo path. The badge updates automatically after each weekly scan — green when your API usage is current, red when drift is detected.

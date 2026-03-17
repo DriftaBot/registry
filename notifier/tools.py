@@ -60,6 +60,8 @@ def log_issue(repo: str, url: str, title: str, company: str, status: str) -> Non
         path = log_dir / f"{issue_number}.json"
         path.write_text(json.dumps(record, indent=2) + "\n")
         print(f"  [logged]  {path.relative_to(REPO_ROOT)}")
+        badge = {"schemaVersion": 1, "label": "DriftaBot", "message": "drift detected", "color": "red"}
+        (log_dir / "badge.json").write_text(json.dumps(badge, indent=2) + "\n")
     except Exception as exc:
         print(f"  [log error] {exc}")
 
@@ -81,6 +83,8 @@ def log_check_passed(repo: str, company: str) -> None:
         path = log_dir / "status.json"
         path.write_text(json.dumps(record, indent=2) + "\n")
         print(f"  [logged]  {path.relative_to(REPO_ROOT)}")
+        badge = {"schemaVersion": 1, "label": "DriftaBot", "message": "passing", "color": "brightgreen"}
+        (log_dir / "badge.json").write_text(json.dumps(badge, indent=2) + "\n")
     except Exception as exc:
         print(f"  [log error] {exc}")
 

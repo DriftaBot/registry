@@ -337,7 +337,7 @@ a.sp-provider-card:hover {
   table-layout: fixed;
 }
 .sp-table th:first-child,
-.sp-table td:first-child { width: 30%; }
+.sp-table td:first-child { width: 25%; }
 .sp-table th {
   text-align: left;
   padding: 0.4rem 0.5rem;
@@ -378,7 +378,7 @@ a.sp-provider-card:hover {
 }
 
 /* ── Issue links ─────────────────────────────────────────────── */
-.sp-issue-list { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+.sp-issue-list { display: flex; flex-direction: column; gap: 0.2rem; }
 .sp-issue-link {
   font-size: 0.8rem;
   padding: 0.1rem 0.4rem;

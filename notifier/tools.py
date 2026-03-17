@@ -221,7 +221,7 @@ def close_open_issues_plain(repo: str, company_display: str, token: str | None =
     closed = 0
     for issue in issues:
         title = issue.get("title", "")
-        if "[DriftaBot]" not in title or company_display not in title:
+        if company_display not in title:
             continue
         number = issue["number"]
         comment = (

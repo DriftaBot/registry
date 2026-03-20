@@ -23,37 +23,58 @@
       </h2>
       <div v-if="filteredProviders.length" class="sp-provider-grid">
         <div v-for="p in filteredProviders" :key="p.name" class="sp-provider-wrap">
-          <component
-            :is="p.githubUrl ? 'a' : 'div'"
-            :href="p.githubUrl ?? undefined"
-            :target="p.githubUrl ? '_blank' : undefined"
-            :rel="p.githubUrl ? 'noopener' : undefined"
-            class="sp-provider-card"
-          >
+          <div class="sp-provider-card" @click="openModal(p)">
             <span class="sp-provider-name">{{ p.displayName }}</span>
             <span class="sp-badges">
               <span :class="['sp-badge', 'sp-badge--' + p.specType]">{{ p.specType }}</span>
-              <span v-if="p.drift" class="sp-badge sp-badge--drift" @click.prevent="toggleDrift(p.name)">drift</span>
+              <span v-if="p.drift" class="sp-badge sp-badge--drift" @click.stop="toggleDrift(p.name)">drift</span>
             </span>
-          </component>
+          </div>
           <div v-if="p.drift && expandedDrifts.has(p.name)" class="sp-drift-detail" v-html="renderMarkdown(p.drift)"></div>
         </div>
       </div>
       <p v-else class="sp-empty">No providers match your search.</p>
     </section>
 
+    <!-- ── Spec Modal ─────────────────────────────────────────── -->
+    <Teleport to="body">
+      <div v-if="modalProvider" class="sp-modal-overlay" @click.self="closeModal">
+        <div class="sp-modal">
+          <div class="sp-modal-header">
+            <span class="sp-modal-title">{{ modalProvider.displayName }}</span>
+            <span class="sp-modal-file">{{ modalProvider.specFile }}</span>
+            <span class="sp-modal-actions">
+              <a v-if="modalProvider.githubUrl" :href="modalProvider.githubUrl" target="_blank" rel="noopener" class="sp-modal-github" title="View on GitHub">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+              </a>
+              <button class="sp-modal-copy" @click="copySpec" :title="copied ? 'Copied!' : 'Copy to clipboard'">
+                <svg v-if="!copied" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                <svg v-else width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </button>
+              <button class="sp-modal-close" @click="closeModal" title="Close">✕</button>
+            </span>
+          </div>
+          <div class="sp-modal-body">
+            <pre class="sp-modal-code"><code>{{ modalProvider.specContent ?? 'No spec file found.' }}</code></pre>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
-import type { StatusData } from '../../status.data'
+import { ref, reactive, computed, watch } from 'vue'
+import type { Provider, StatusData } from '../../status.data'
 
 const props = defineProps<{ data: StatusData }>()
 
 const query = ref('')
 const driftFilter = ref(false)
 const expandedDrifts = reactive(new Set<string>())
+const modalProvider = ref<Provider | null>(null)
+const copied = ref(false)
 
 const q = computed(() => query.value.trim().toLowerCase())
 
@@ -76,6 +97,33 @@ function toggleDriftFilter() { driftFilter.value = !driftFilter.value }
 function toggleDrift(name: string) {
   expandedDrifts.has(name) ? expandedDrifts.delete(name) : expandedDrifts.add(name)
 }
+
+function openModal(p: Provider) {
+  modalProvider.value = p
+  copied.value = false
+  document.body.style.overflow = 'hidden'
+}
+
+function closeModal() {
+  modalProvider.value = null
+  document.body.style.overflow = ''
+}
+
+function copySpec() {
+  if (!modalProvider.value?.specContent) return
+  navigator.clipboard.writeText(modalProvider.value.specContent).then(() => {
+    copied.value = true
+    setTimeout(() => { copied.value = false }, 2000)
+  })
+}
+
+// Close modal on Escape
+watch(modalProvider, (v) => {
+  const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') closeModal() }
+  if (v) window.addEventListener('keydown', handler)
+  else window.removeEventListener('keydown', handler)
+})
+
 function renderMarkdown(md: string): string {
   return md
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -188,9 +236,10 @@ function renderMarkdown(md: string): string {
   gap: 0.5rem;
   text-decoration: none;
   color: inherit;
+  cursor: pointer;
   transition: border-color 0.2s, background 0.2s;
 }
-a.sp-provider-card:hover {
+.sp-provider-card:hover {
   border-color: var(--vp-c-brand-1);
   background: var(--vp-c-bg-elv);
 }
@@ -239,6 +288,99 @@ a.sp-provider-card:hover {
   padding: 0.1rem 0.3rem;
   border-radius: 3px;
   font-size: 0.78rem;
+}
+
+/* ── Modal ───────────────────────────────────────────────────── */
+.sp-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+.sp-modal {
+  background: var(--vp-c-bg);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 900px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+.sp-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--vp-c-divider);
+  flex-shrink: 0;
+}
+.sp-modal-title {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--vp-c-text-1);
+}
+.sp-modal-file {
+  font-size: 0.78rem;
+  color: var(--vp-c-text-3);
+  font-family: var(--vp-font-family-mono);
+}
+.sp-modal-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.sp-modal-github {
+  color: var(--vp-c-text-2);
+  display: flex;
+  transition: color 0.2s;
+}
+.sp-modal-github:hover { color: var(--vp-c-text-1); }
+.sp-modal-copy {
+  background: none;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 6px;
+  padding: 0.3rem 0.4rem;
+  cursor: pointer;
+  color: var(--vp-c-text-2);
+  display: flex;
+  align-items: center;
+  transition: color 0.2s, border-color 0.2s;
+}
+.sp-modal-copy:hover {
+  color: var(--vp-c-brand-1);
+  border-color: var(--vp-c-brand-1);
+}
+.sp-modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--vp-c-text-3);
+  font-size: 1rem;
+  padding: 0.2rem 0.4rem;
+  line-height: 1;
+}
+.sp-modal-close:hover { color: var(--vp-c-text-1); }
+.sp-modal-body {
+  overflow: auto;
+  padding: 0;
+}
+.sp-modal-code {
+  margin: 0;
+  padding: 1rem;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  background: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-1);
+  white-space: pre;
+  overflow-x: auto;
+  border-radius: 0 0 12px 12px;
 }
 
 /* ── Dark mode overrides ─────────────────────────────────────── */

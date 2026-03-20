@@ -12,6 +12,8 @@ export interface Provider {
   githubUrl: string | null
   repoSlug: string | null
   drift: string | null
+  specFile: string | null
+  specContent: string | null
 }
 
 export interface StatusData {
@@ -90,6 +92,19 @@ export default {
         const specType = sub.find(e => e.isDirectory())?.name ?? 'openapi'
         const m        = meta.get(entry.name)
         const repoSlug = m?.repoSlug ?? null
+
+        // Find the spec file inside <name>/<specType>/
+        let specFile: string | null = null
+        let specContent: string | null = null
+        const specDir = join(providersDir, entry.name, specType)
+        if (existsSync(specDir)) {
+          const files = readdirSync(specDir).filter(f => /\.(json|yaml|yml|proto)$/.test(f))
+          if (files.length > 0) {
+            specFile = files[0]
+            specContent = readFileSync(join(specDir, files[0]), 'utf-8')
+          }
+        }
+
         providers.push({
           name:        entry.name,
           displayName: m?.displayName ?? entry.name,
@@ -97,6 +112,8 @@ export default {
           githubUrl:   m?.githubUrl ?? null,
           repoSlug,
           drift:       repoSlug ? (drifts.get(repoSlug) ?? null) : null,
+          specFile,
+          specContent,
         })
       }
     }

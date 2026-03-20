@@ -17,20 +17,27 @@
       <h2 class="sp-section-title">
         Providers
         <span class="sp-count-title">{{ filteredProviders.length }}</span>
+        <span v-if="driftCount" class="sp-drift-count" @click="toggleDriftFilter">
+          {{ driftFilter ? 'show all' : `${driftCount} drifts` }}
+        </span>
       </h2>
       <div v-if="filteredProviders.length" class="sp-provider-grid">
-        <component
-          :is="p.githubUrl ? 'a' : 'div'"
-          v-for="p in filteredProviders"
-          :key="p.name"
-          :href="p.githubUrl ?? undefined"
-          :target="p.githubUrl ? '_blank' : undefined"
-          :rel="p.githubUrl ? 'noopener' : undefined"
-          class="sp-provider-card"
-        >
-          <span class="sp-provider-name">{{ p.displayName }}</span>
-          <span :class="['sp-badge', 'sp-badge--' + p.specType]">{{ p.specType }}</span>
-        </component>
+        <div v-for="p in filteredProviders" :key="p.name" class="sp-provider-wrap">
+          <component
+            :is="p.githubUrl ? 'a' : 'div'"
+            :href="p.githubUrl ?? undefined"
+            :target="p.githubUrl ? '_blank' : undefined"
+            :rel="p.githubUrl ? 'noopener' : undefined"
+            class="sp-provider-card"
+          >
+            <span class="sp-provider-name">{{ p.displayName }}</span>
+            <span class="sp-badges">
+              <span :class="['sp-badge', 'sp-badge--' + p.specType]">{{ p.specType }}</span>
+              <span v-if="p.drift" class="sp-badge sp-badge--drift" @click.prevent="toggleDrift(p.name)">drift</span>
+            </span>
+          </component>
+          <div v-if="p.drift && expandedDrifts.has(p.name)" class="sp-drift-detail" v-html="renderMarkdown(p.drift)"></div>
+        </div>
       </div>
       <p v-else class="sp-empty">No providers match your search.</p>
     </section>
@@ -39,23 +46,49 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import type { StatusData } from '../../status.data'
 
 const props = defineProps<{ data: StatusData }>()
 
 const query = ref('')
+const driftFilter = ref(false)
+const expandedDrifts = reactive(new Set<string>())
 
 const q = computed(() => query.value.trim().toLowerCase())
 
-const filteredProviders = computed(() =>
-  q.value
-    ? props.data.providers.filter(p =>
-        p.name.toLowerCase().includes(q.value) ||
-        p.specType.toLowerCase().includes(q.value)
-      )
-    : props.data.providers
-)
+const driftCount = computed(() => props.data.providers.filter(p => p.drift).length)
+
+const filteredProviders = computed(() => {
+  let list = props.data.providers
+  if (driftFilter.value) list = list.filter(p => p.drift)
+  if (q.value) {
+    list = list.filter(p =>
+      p.name.toLowerCase().includes(q.value) ||
+      p.specType.toLowerCase().includes(q.value) ||
+      (q.value === 'drift' && p.drift)
+    )
+  }
+  return list
+})
+
+function toggleDriftFilter() { driftFilter.value = !driftFilter.value }
+function toggleDrift(name: string) {
+  expandedDrifts.has(name) ? expandedDrifts.delete(name) : expandedDrifts.add(name)
+}
+function renderMarkdown(md: string): string {
+  return md
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/^### (.+)$/gm, '<h4>$1</h4>')
+    .replace(/^## (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^# (.+)$/gm, '<h2>$1</h2>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/^- (.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
+    .replace(/\n{2,}/g, '<br/><br/>')
+    .replace(/\n/g, '<br/>')
+}
 </script>
 
 <style scoped>
@@ -121,7 +154,24 @@ const filteredProviders = computed(() =>
   font-size: 0.9rem;
 }
 
+/* ── Drift filter toggle ────────────────────────────────────── */
+.sp-drift-count {
+  font-size: 0.72rem;
+  background: #fff7ed;
+  color: #c2410c;
+  padding: 0.1rem 0.5rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  user-select: none;
+  transition: background 0.2s;
+}
+.sp-drift-count:hover { background: #fed7aa; }
+.dark .sp-drift-count { background: #431407; color: #fdba74; }
+.dark .sp-drift-count:hover { background: #7c2d12; }
+
 /* ── Provider grid ───────────────────────────────────────────── */
+.sp-provider-wrap { display: contents; }
 .sp-provider-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -153,6 +203,11 @@ a.sp-provider-card:hover {
 }
 
 /* ── Badges ──────────────────────────────────────────────────── */
+.sp-badges {
+  display: flex;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
 .sp-badge {
   font-size: 0.7rem;
   padding: 0.1rem 0.4rem;
@@ -164,9 +219,33 @@ a.sp-provider-card:hover {
 .sp-badge--openapi { background: #dbeafe; color: #1d4ed8; }
 .sp-badge--graphql { background: #fce7f3; color: #be185d; }
 .sp-badge--grpc    { background: #dcfce7; color: #15803d; }
+.sp-badge--drift   { background: #fff7ed; color: #c2410c; cursor: pointer; }
+.sp-badge--drift:hover { background: #fed7aa; }
+
+/* ── Drift detail panel ─────────────────────────────────────── */
+.sp-drift-detail {
+  grid-column: 1 / -1;
+  padding: 0.75rem 1rem;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  background: #fffbeb;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--vp-c-text-1);
+  overflow-x: auto;
+}
+.sp-drift-detail code {
+  background: var(--vp-c-bg-mute);
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  font-size: 0.78rem;
+}
 
 /* ── Dark mode overrides ─────────────────────────────────────── */
 .dark .sp-badge--openapi { background: #1e3a5f; color: #93c5fd; }
 .dark .sp-badge--graphql { background: #500724; color: #f9a8d4; }
 .dark .sp-badge--grpc    { background: #14532d; color: #86efac; }
+.dark .sp-badge--drift   { background: #431407; color: #fdba74; }
+.dark .sp-badge--drift:hover { background: #7c2d12; }
+.dark .sp-drift-detail   { background: #1c1007; border-color: #7c2d12; }
 </style>

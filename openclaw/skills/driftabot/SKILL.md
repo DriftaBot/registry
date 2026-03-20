@@ -1,6 +1,7 @@
 ---
 name: driftabot
 description: Query the DriftaBot Registry for API spec drifts, breaking changes, and provider information. Use when the user asks about API changes, breaking changes, provider specs, or what changed in a specific API.
+metadata: {"openclaw.emoji": "🔍", "openclaw.homepage": "https://driftabot.github.io/registry/"}
 ---
 
 # DriftaBot Registry Skill

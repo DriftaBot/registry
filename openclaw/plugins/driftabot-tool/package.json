@@ -1,8 +1,17 @@
 {
-  "name": "openclaw-driftabot-tool",
+  "name": "openclaw-driftabot",
   "version": "1.0.0",
   "description": "OpenClaw agent tools for DriftaBot Registry — query API spec drift and breaking change reports",
   "main": "dist/index.js",
+  "files": ["dist/**", "README.md"],
+  "keywords": ["openclaw", "driftabot", "api", "openapi", "drift", "breaking-changes", "agent-tools"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DriftaBot/registry.git",
+    "directory": "openclaw/plugins/driftabot-tool"
+  },
+  "homepage": "https://driftabot.github.io/registry/",
   "scripts": {
     "build": "tsc"
   },

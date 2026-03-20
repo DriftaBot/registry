@@ -89,14 +89,24 @@ def main() -> None:
 
         out_dir = drifts_dir / org / repo_name
         out_dir.mkdir(parents=True, exist_ok=True)
-        result_path = out_dir / "result.json"
+        result_path = out_dir / "result.md"
 
         print(f"  [diff] {name} ({spec_type}): {old_spec} -> {new_spec}")
 
         result = subprocess.run(
-            ["driftabot", spec_type, "--base", str(old_spec), "--head", str(new_spec), "--format", "json"],
+            ["driftabot", spec_type, "--base", str(old_spec), "--head", str(new_spec), "--format", "markdown"],
             capture_output=True,
         )
+
+        if result.stderr:
+            print(f"  [warn] {name}: {result.stderr.decode().strip()}")
+
+        if not result.stdout.strip():
+            print(f"  [skip] {name}: no drift detected")
+            if result_path.exists():
+                result_path.unlink()
+            continue
+
         result_path.write_bytes(result.stdout)
         print(f"  [saved] {result_path.relative_to(REPO_ROOT)}")
 

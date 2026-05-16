@@ -6845,6 +6845,60 @@
         }
       }
     },
+    "/enterprises/{enterprise}/copilot/metrics/reports/user-teams-1-day": {
+      "get": {
+        "summary": "Get Copilot enterprise user-teams report for a specific day",
+        "description": "Use this endpoint to retrieve download links for the Copilot enterprise user-teams report for a specific day. The report provides user-team join data for Copilot across the enterprise, with one entry per user-team pair.\n\nThe report contains user-team membership data for the specified day, enabling consumers to join with the existing enterprise user reports to compute team-level usage metrics. Reports are generated daily and made available for download through signed URLs with a limited expiration time.\n\nThe response includes download links to the report files, along with the specific date of the report. The report covers a complete day for which data has been processed.\n\nEnterprise owners, billing managers, and authorized users with fine-grained \"View Enterprise Copilot Metrics\" permission can retrieve Copilot metrics reports for the enterprise. OAuth app tokens and personal access tokens (classic) need either the `manage_billing:copilot` or `read:enterprise` scopes to use this endpoint.",
+        "tags": [
+          "copilot"
+        ],
+        "operationId": "copilot/copilot-enterprise-user-teams-one-day-report",
+        "externalDocs": {
+          "description": "API method documentation",
+          "url": "https://docs.github.com/rest/copilot/copilot-usage-metrics#get-copilot-enterprise-user-teams-report-for-a-specific-day"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/enterprise"
+          },
+          {
+            "$ref": "#/components/parameters/day"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/copilot-usage-metrics-1-day-report"
+                },
+                "examples": {
+                  "default": {
+                    "$ref": "#/components/examples/copilot-usage-metrics-1-day-report"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/internal_error"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/not_found"
+          }
+        },
+        "x-github": {
+          "githubCloudOnly": false,
+          "enabledForGitHubApps": true,
+          "category": "copilot",
+          "subcategory": "copilot-usage-metrics"
+        }
+      }
+    },
     "/enterprises/{enterprise}/copilot/metrics/reports/users-1-day": {
       "get": {
         "summary": "Get Copilot users usage metrics for a specific day",
@@ -23017,7 +23071,7 @@
     "/orgs/{org}/copilot-spaces": {
       "get": {
         "summary": "List organization Copilot Spaces",
-        "description": "Lists Copilot Spaces owned by an organization. The authenticated user must have read access to the organization's Copilot Spaces.\n\nOnly Spaces that are readable by the authenticated user are returned. This includes public Spaces and internal Spaces if the user is a member of the organization.\n\nOAuth app tokens and personal access tokens (classic) need the `read:org` scope to use this endpoint.",
+        "description": "Lists Copilot Spaces owned by an organization. The authenticated user must have read access to the organization's Copilot Spaces.\n\nOnly Spaces that are readable by the authenticated user are returned. This includes public Spaces and internal Spaces if the user is a member of the organization.\n\nOAuth app tokens and personal access tokens (classic) need the `read:org` scope to use this endpoint.\n\nFine-grained tokens and GitHub App user access tokens must have been granted access to the organization that owns the space. They must also have been granted access to every repository referenced by resources in a space; spaces with inaccessible resources are omitted from the response.",
         "tags": [
           "copilot-spaces"
         ],
@@ -23106,7 +23160,7 @@
       },
       "post": {
         "summary": "Create an organization Copilot Space",
-        "description": "Creates a new Copilot Space owned by an organization. The authenticated user must have permissions to create spaces in the organization.\n\nOrganization members with appropriate permissions can create Copilot Spaces to be shared within their organization.\n\nOAuth app tokens and personal access tokens (classic) need the `read:org` scope to use this endpoint.",
+        "description": "Creates a new Copilot Space owned by an organization. The authenticated user must have permissions to create spaces in the organization.\n\nOrganization members with appropriate permissions can create Copilot Spaces to be shared within their organization.\n\nOAuth app tokens and personal access tokens (classic) need the `read:org` scope to use this endpoint.\n\nFine-grained tokens and GitHub App user access tokens must have been granted access to the organization that owns the space. They must also have been granted access to every repository referenced by the submitted resources.",
         "tags": [
           "copilot-spaces"
         ],
@@ -23271,7 +23325,7 @@
     "/orgs/{org}/copilot-spaces/{space_number}": {
       "get": {
         "summary": "Get an organization Copilot Space",
-        "description": "Gets details about a specific Copilot Space owned by an organization. The authenticated user must have read access to the Space.\n\nInternal Spaces require the authenticated user to be a member of the organization or have been granted read permissions.\n\nOAuth app tokens and personal access tokens (classic) need the `read:org` scope to use this endpoint.",
+        "description": "Gets details about a specific Copilot Space owned by an organization. The authenticated user must have read access to the Space.\n\nInternal Spaces require the authenticated user to be a member of the organization or have been granted read permissions.\n\nOAuth app tokens and personal access tokens (classic) need the `read:org` scope to use this endpoint.\n\nFine-grained tokens and GitHub App user access tokens must have been granted access to the organization that owns the space. They must also have been granted access to every repository referenced by resources in the space.",
         "tags": [
           "copilot-spaces"
         ],
@@ -23325,7 +23379,7 @@
       },
       "put": {
         "summary": "Set an organization Copilot Space",
-        "description": "Updates a Copilot Space owned by an organization. The authenticated user must have permissions to update spaces in the organization.\n\nOrganization members with appropriate permissions can update Copilot Spaces owned by their organization.\n\nOAuth app tokens and personal access tokens (classic) need the `read:org` scope to use this endpoint.",
+        "description": "Updates a Copilot Space owned by an organization. The authenticated user must have permissions to update spaces in the organization.\n\nOrganization members with appropriate permissions can update Copilot Spaces owned by their organization.\n\nOAuth app tokens and personal access tokens (classic) need the `read:org` scope to use this endpoint.\n\nFine-grained tokens and GitHub App user access tokens must have been granted access to the organization that owns the space. They must also have been granted access to every repository referenced by resources in the space, including any being added or updated.",
         "tags": [
           "copilot-spaces"
         ],
@@ -23498,7 +23552,7 @@
       },
       "delete": {
         "summary": "Delete an organization Copilot Space",
-        "description": "Deletes a Copilot Space owned by an organization. The authenticated user must have permissions to delete spaces in the organization.\n\n**Warning:** This action is permanent and cannot be undone. Deleting a Copilot Space will remove all associated resources and configurations.\n\nOrganization members with appropriate permissions can delete Copilot Spaces owned by their organization.\n\nOAuth app tokens and personal access tokens (classic) need both the `read:org` and `repo` scopes to use this endpoint.",
+        "description": "Deletes a Copilot Space owned by an organization. The authenticated user must have permissions to delete spaces in the organization.\n\n**Warning:** This action is permanent and cannot be undone. Deleting a Copilot Space will remove all associated resources and configurations.\n\nOrganization members with appropriate permissions can delete Copilot Spaces owned by their organization.\n\nOAuth app tokens and personal access tokens (classic) need both the `read:org` and `repo` scopes to use this endpoint.\n\nFine-grained tokens and GitHub App user access tokens must have been granted access to the organization that owns the space. They must also have been granted access to every repository referenced by resources in the space.",
         "tags": [
           "copilot-spaces"
         ],
@@ -23542,7 +23596,7 @@
     "/orgs/{org}/copilot-spaces/{space_number}/collaborators": {
       "get": {
         "summary": "List collaborators for an organization Copilot Space",
-        "description": "Lists all collaborators for a specific Copilot Space owned by an organization. The authenticated user must have appropriate permissions to view collaborators.\n\nEach collaborator entry specifies which user or team has access to the space and at what level (reader, writer, or admin). The space owner (organization) is excluded from this list.\n\n**Note:** Team collaborators listed here are teams that are defined in the organization.\n\nOAuth app tokens and personal access tokens (classic) need the `read:org` scope to use this endpoint.",
+        "description": "Lists all collaborators for a specific Copilot Space owned by an organization. The authenticated user must have appropriate permissions to view collaborators.\n\nEach collaborator entry specifies which user or team has access to the space and at what level (reader, writer, or admin). The space owner (organization) is excluded from this list.\n\n**Note:** Team collaborators listed here are teams that are defined in the organization.\n\nOAuth app tokens and personal access tokens (classic) need the `read:org` scope to use this endpoint.\n\nFine-grained tokens and GitHub App user access tokens must have been granted access to the organization that owns the space. They must also have been granted access to every repository referenced by resources in the space.",
         "tags": [
           "copilot-spaces"
         ],
@@ -23680,7 +23734,7 @@
       },
       "post": {
         "summary": "Add a collaborator to an organization Copilot Space",
-        "description": "Adds a collaborator (user or team) to a specific Copilot Space owned by an organization. The authenticated user must have appropriate permissions to manage collaborators.\n\n**Note:** When adding users as collaborators, they must already be members of the organization.\nWhen adding teams as collaborators, they must be defined in the organization.\n\nOAuth app tokens and personal access tokens (classic) need the `write:org` scope to use this endpoint.",
+        "description": "Adds a collaborator (user or team) to a specific Copilot Space owned by an organization. The authenticated user must have appropriate permissions to manage collaborators.\n\n**Note:** When adding users as collaborators, they must already be members of the organization.\nWhen adding teams as collaborators, they must be defined in the organization.\n\nOAuth app tokens and personal access tokens (classic) need the `write:org` scope to use this endpoint.\n\nFine-grained tokens and GitHub App user access tokens must have been granted access to the organization that owns the space. They must also have been granted access to every repository referenced by resources in the space.",
         "tags": [
           "copilot-spaces"
         ],
@@ -23849,7 +23903,7 @@
     "/orgs/{org}/copilot-spaces/{space_number}/collaborators/{actor_type}/{actor_identifier}": {
       "put": {
         "summary": "Set a collaborator role for an organization Copilot Space",
-        "description": "Updates the role of a collaborator for a specific Copilot Space owned by an organization. The authenticated user must have appropriate permissions to manage collaborators.\n\nOAuth app tokens and personal access tokens (classic) need the `write:org` scope to use this endpoint.",
+        "description": "Updates the role of a collaborator for a specific Copilot Space owned by an organization. The authenticated user must have appropriate permissions to manage collaborators.\n\nOAuth app tokens and personal access tokens (classic) need the `write:org` scope to use this endpoint.\n\nFine-grained tokens and GitHub App user access tokens must have been granted access to the organization that owns the space. They must also have been granted access to every repository referenced by resources in the space.",
         "tags": [
           "copilot-spaces"
         ],
@@ -24019,7 +24073,7 @@
       },
       "delete": {
         "summary": "Remove a collaborator from an organization Copilot Space",
-        "description": "Removes a collaborator from a specific Copilot Space owned by an organization. The authenticated user must have appropriate permissions to manage collaborators.\n\nOAuth app tokens and personal access tokens (classic) need the `write:org` scope to use this endpoint.",
+        "description": "Removes a collaborator from a specific Copilot Space owned by an organization. The authenticated user must have appropriate permissions to manage collaborators.\n\nOAuth app tokens and personal access tokens (classic) need the `write:org` scope to use this endpoint.\n\nFine-grained tokens and GitHub App user access tokens must have been granted access to the organization that owns the space. They must also have been granted access to every repository referenced by resources in the space.",
         "tags": [
           "copilot-spaces"
         ],
@@ -24085,7 +24139,7 @@
     "/orgs/{org}/copilot-spaces/{space_number}/resources": {
       "get": {
         "summary": "List resources for an organization Copilot Space",
-        "description": "Lists all resources attached to a specific Copilot Space owned by an organization.\nThe authenticated user must have appropriate permissions to view the space.\n\nOAuth app tokens and personal access tokens (classic) need the `read:org` scope to use this endpoint.",
+        "description": "Lists all resources attached to a specific Copilot Space owned by an organization.\nThe authenticated user must have appropriate permissions to view the space.\n\nOAuth app tokens and personal access tokens (classic) need the `read:org` scope to use this endpoint.\n\nFine-grained tokens and GitHub App user access tokens must have been granted access to the organization that owns the space. They must also have been granted access to every repository referenced by resources in the space.",
         "tags": [
           "copilot-spaces"
         ],
@@ -24175,7 +24229,7 @@
       },
       "post": {
         "summary": "Create a resource for an organization Copilot Space",
-        "description": "Creates a new resource in a specific Copilot Space owned by an organization.\nThe authenticated user must have write permissions on the space.\n\nThe following resource types are supported: `repository`, `github_file`, `free_text`, `github_issue`, `github_pull_request`.\nThe `uploaded_text_file` and `media_content` types are not supported via this endpoint.\n\nFor `github_file` resources, if a resource with the same repository, file path, and SHA already exists, the existing resource is returned with a `200` status.\n\nOAuth app tokens and personal access tokens (classic) need the `write:org` scope to use this endpoint.",
+        "description": "Creates a new resource in a specific Copilot Space owned by an organization.\nThe authenticated user must have write permissions on the space.\n\nThe following resource types are supported: `repository`, `github_file`, `free_text`, `github_issue`, `github_pull_request`.\nThe `uploaded_text_file` and `media_content` types are not supported via this endpoint.\n\nFor `github_file` resources, if a resource with the same repository, file path, and SHA already exists, the existing resource is returned with a `200` status.\n\nOAuth app tokens and personal access tokens (classic) need the `write:org` scope to use this endpoint.\n\nFine-grained tokens and GitHub App user access tokens must have been granted access to the organization that owns the space. They must also have been granted access to every repository referenced by resources in the space, including the resource being created.",
         "tags": [
           "copilot-spaces"
         ],
@@ -24331,7 +24385,7 @@
     "/orgs/{org}/copilot-spaces/{space_number}/resources/{space_resource_id}": {
       "get": {
         "summary": "Get a resource for an organization Copilot Space",
-        "description": "Gets a specific resource attached to a Copilot Space owned by an organization.\nThe authenticated user must have appropriate permissions to view the space.\n\nOAuth app tokens and personal access tokens (classic) need the `read:org` scope to use this endpoint.",
+        "description": "Gets a specific resource attached to a Copilot Space owned by an organization.\nThe authenticated user must have appropriate permissions to view the space.\n\nOAuth app tokens and personal access tokens (classic) need the `read:org` scope to use this endpoint.\n\nFine-grained tokens and GitHub App user access tokens must have been granted access to the organization that owns the space. They must also have been granted access to every repository referenced by resources in the space.",
         "tags": [
           "copilot-spaces"
         ],
@@ -24404,7 +24458,7 @@
       },
       "put": {
         "summary": "Set a resource for an organization Copilot Space",
-        "description": "Updates the metadata of a resource in a specific Copilot Space owned by an organization.\nThe authenticated user must have write permissions on the space.\n\nOAuth app tokens and personal access tokens (classic) need the `write:org` scope to use this endpoint.",
+        "description": "Updates the metadata of a resource in a specific Copilot Space owned by an organization.\nThe authenticated user must have write permissions on the space.\n\nOAuth app tokens and personal access tokens (classic) need the `write:org` scope to use this endpoint.\n\nFine-grained tokens and GitHub App user access tokens must have been granted access to the organization that owns the space. They must also have been granted access to every repository referenced by resources in the space, including the resource being updated.",
         "tags": [
           "copilot-spaces"
         ],
@@ -24507,7 +24561,7 @@
       },
       "delete": {
         "summary": "Delete a resource from an organization Copilot Space",
-        "description": "Deletes a resource from a specific Copilot Space owned by an organization.\nThe authenticated user must have write permissions on the space.\n\nOAuth app tokens and personal access tokens (classic) need the `write:org` scope to use this endpoint.",
+        "description": "Deletes a resource from a specific Copilot Space owned by an organization.\nThe authenticated user must have write permissions on the space.\n\nOAuth app tokens and personal access tokens (classic) need the `write:org` scope to use this endpoint.\n\nFine-grained tokens and GitHub App user access tokens must have been granted access to the organization that owns the space. They must also have been granted access to every repository referenced by resources in the space.",
         "tags": [
           "copilot-spaces"
         ],
@@ -25874,6 +25928,63 @@
                 }
               }
             }
+          },
+          "500": {
+            "$ref": "#/components/responses/internal_error"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/not_found"
+          }
+        },
+        "x-github": {
+          "githubCloudOnly": false,
+          "enabledForGitHubApps": true,
+          "category": "copilot",
+          "subcategory": "copilot-usage-metrics"
+        }
+      }
+    },
+    "/orgs/{org}/copilot/metrics/reports/user-teams-1-day": {
+      "get": {
+        "summary": "Get Copilot organization user-teams report for a specific day",
+        "description": "Use this endpoint to retrieve download links for the Copilot organization user-teams report for a specific day. The report provides user-team join data for Copilot across the organization, with one entry per user-team pair.\n\nThe report contains user-team membership data for the specified day, enabling consumers to join with the existing organization user reports to compute team-level usage metrics. Reports are generated daily and made available for download through signed URLs with a limited expiration time.\n\nThe response includes download links to the report files, along with the specific date of the report. The report covers a complete day for which data has been processed.\n\nOrganization owners and authorized users with fine-grained \"View Organization Copilot Metrics\" permission can retrieve Copilot metrics reports for the organization. OAuth app tokens and personal access tokens (classic) need the `read:org` scope to use this endpoint.\n\nFor more information about organization metrics attribution, see [How are metrics attributed across organizations](https://docs.github.com/copilot/concepts/copilot-metrics#how-are-metrics-attributed-across-organizations).",
+        "tags": [
+          "copilot"
+        ],
+        "operationId": "copilot/copilot-organization-user-teams-one-day-report",
+        "externalDocs": {
+          "description": "API method documentation",
+          "url": "https://docs.github.com/rest/copilot/copilot-usage-metrics#get-copilot-organization-user-teams-report-for-a-specific-day"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/org"
+          },
+          {
+            "$ref": "#/components/parameters/day"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/copilot-usage-metrics-1-day-report"
+                },
+                "examples": {
+                  "default": {
+                    "$ref": "#/components/examples/copilot-usage-metrics-1-day-report"
+                  }
+                }
+              }
+            }
+          },
+          "204": {
+            "$ref": "#/components/responses/no_content"
           },
           "500": {
             "$ref": "#/components/responses/internal_error"
@@ -54216,6 +54327,178 @@
         }
       }
     },
+    "/repos/{owner}/{repo}/copilot/cloud-agent/configuration": {
+      "get": {
+        "summary": "Get Copilot cloud agent configuration for a repository",
+        "description": "> [!NOTE]\n> This endpoint is in public preview and is subject to change.\n\nGets the Copilot cloud agent configuration for a repository, including MCP server\nconfiguration, enabled review tools, Actions workflow approval settings, and firewall\nconfiguration.\n\nOAuth app tokens and personal access tokens (classic) need the `repo` scope to use this endpoint.",
+        "tags": [
+          "copilot"
+        ],
+        "operationId": "copilot/get-copilot-cloud-agent-configuration",
+        "externalDocs": {
+          "description": "API method documentation",
+          "url": "https://docs.github.com/rest/copilot/copilot-cloud-agent-management#get-copilot-cloud-agent-configuration-for-a-repository"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/owner"
+          },
+          {
+            "$ref": "#/components/parameters/repo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mcp_configuration": {
+                      "description": "The user-supplied MCP server configuration for the repository, as a free-form JSON object. This will be set to `null` if no configuration has been set.\n\nThe shape of a valid MCP configuration may evolve over time, so this property is intentionally not strictly typed. Clients should not assume a fixed schema.",
+                      "nullable": true,
+                      "type": "object",
+                      "additionalProperties": true
+                    },
+                    "enabled_tools": {
+                      "type": "object",
+                      "description": "The enabled review tools for Copilot cloud agent.",
+                      "properties": {
+                        "codeql": {
+                          "type": "boolean",
+                          "description": "Whether the CodeQL tool is enabled for the Copilot cloud agent."
+                        },
+                        "copilot_code_review": {
+                          "type": "boolean",
+                          "description": "Whether the Copilot code review tool is enabled for the Copilot cloud agent."
+                        },
+                        "secret_scanning": {
+                          "type": "boolean",
+                          "description": "Whether the secret scanning tool is enabled for the Copilot cloud agent."
+                        },
+                        "dependency_vulnerability_checks": {
+                          "type": "boolean",
+                          "description": "Whether the dependency vulnerability checks tool is enabled for the Copilot cloud agent."
+                        }
+                      },
+                      "required": [
+                        "codeql",
+                        "copilot_code_review",
+                        "secret_scanning",
+                        "dependency_vulnerability_checks"
+                      ]
+                    },
+                    "require_actions_workflow_approval": {
+                      "type": "boolean",
+                      "description": "Whether Actions workflow approval is required for Copilot cloud agent pull requests."
+                    },
+                    "is_firewall_enabled": {
+                      "type": "boolean",
+                      "description": "Whether the firewall is enabled."
+                    },
+                    "is_firewall_recommended_allowlist_enabled": {
+                      "type": "boolean",
+                      "description": "Whether the firewall recommended allowlist is enabled."
+                    },
+                    "custom_allowlist": {
+                      "type": "array",
+                      "description": "A list of custom allowlist entries, as hosts or URLs, that the firewall will allow the Copilot cloud agent to access.",
+                      "items": {
+                        "type": "string",
+                        "description": "A custom allowlist entry, as a host or URL, that the firewall will allow the Copilot cloud agent to access."
+                      }
+                    }
+                  },
+                  "required": [
+                    "mcp_configuration",
+                    "enabled_tools",
+                    "require_actions_workflow_approval",
+                    "is_firewall_enabled",
+                    "is_firewall_recommended_allowlist_enabled",
+                    "custom_allowlist"
+                  ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Default configuration",
+                    "value": {
+                      "mcp_configuration": null,
+                      "enabled_tools": {
+                        "codeql": true,
+                        "copilot_code_review": true,
+                        "secret_scanning": true,
+                        "dependency_vulnerability_checks": true
+                      },
+                      "require_actions_workflow_approval": true,
+                      "is_firewall_enabled": true,
+                      "is_firewall_recommended_allowlist_enabled": true,
+                      "custom_allowlist": []
+                    }
+                  },
+                  "configured": {
+                    "summary": "Configuration with an MCP server and a custom firewall allowlist",
+                    "value": {
+                      "mcp_configuration": {
+                        "mcpServers": {
+                          "sentry": {
+                            "type": "local",
+                            "command": "npx",
+                            "args": [
+                              "@sentry/mcp-server@latest",
+                              "--host=$SENTRY_HOST"
+                            ],
+                            "env": {
+                              "SENTRY_HOST": "https://octo-org.sentry.io",
+                              "SENTRY_ACCESS_TOKEN": "$COPILOT_MCP_SENTRY_ACCESS_TOKEN"
+                            },
+                            "tools": [
+                              "search_issues",
+                              "get_issue_details"
+                            ]
+                          }
+                        }
+                      },
+                      "enabled_tools": {
+                        "codeql": true,
+                        "copilot_code_review": true,
+                        "secret_scanning": true,
+                        "dependency_vulnerability_checks": true
+                      },
+                      "require_actions_workflow_approval": false,
+                      "is_firewall_enabled": true,
+                      "is_firewall_recommended_allowlist_enabled": true,
+                      "custom_allowlist": [
+                        "sentry.io",
+                        "https://api.example.com"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/internal_error"
+          },
+          "401": {
+            "$ref": "#/components/responses/requires_authentication"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/not_found"
+          }
+        },
+        "x-github": {
+          "githubCloudOnly": false,
+          "enabledForGitHubApps": true,
+          "category": "copilot",
+          "subcategory": "copilot-cloud-agent-management"
+        }
+      }
+    },
     "/repos/{owner}/{repo}/dependabot/alerts": {
       "get": {
         "summary": "List Dependabot alerts for a repository",
@@ -54844,6 +55127,15 @@
           },
           "403": {
             "$ref": "#/components/responses/dependency_review_forbidden"
+          },
+          "400": {
+            "$ref": "#/components/responses/bad_request"
+          },
+          "500": {
+            "$ref": "#/components/responses/internal_error"
+          },
+          "503": {
+            "$ref": "#/components/responses/service_unavailable"
           }
         },
         "x-github": {
@@ -60559,6 +60851,15 @@
           {
             "name": "mentioned",
             "description": "A user that's mentioned in the issue.",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "issue_field_values",
+            "description": "A comma-separated list of issue field filters in `field_slug:value` format.\nOnly issues matching all specified field values are returned.\nRequires issue fields to be enabled for the repository. Issue fields are\nnot available for user-owned repositories, and field availability for\norganization-owned public repositories depends on the organization's\nvisibility settings. For example, `priority:Urgent,severity:High` filters\nissues where the `priority` field is `Urgent` AND the `severity` field is\n`High`.",
             "in": "query",
             "required": false,
             "schema": {
@@ -67657,94 +67958,6 @@
         }
       }
     },
-    "/repos/{owner}/{repo}/pulls/{pull_number}/archive": {
-      "put": {
-        "summary": "Archive a pull request",
-        "description": "Archives a pull request. Closes, locks, and marks the pull request as archived.\nOnly repository admins can archive pull requests.\nArchived pull requests are hidden from non-admin users.",
-        "tags": [
-          "pulls"
-        ],
-        "operationId": "pulls/archive",
-        "externalDocs": {
-          "description": "API method documentation",
-          "url": "https://docs.github.com/rest/pulls/pulls#archive-a-pull-request"
-        },
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/owner"
-          },
-          {
-            "$ref": "#/components/parameters/repo"
-          },
-          {
-            "$ref": "#/components/parameters/pull-number"
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Response"
-          },
-          "403": {
-            "$ref": "#/components/responses/forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/not_found"
-          },
-          "422": {
-            "$ref": "#/components/responses/validation_failed"
-          }
-        },
-        "x-github": {
-          "githubCloudOnly": false,
-          "enabledForGitHubApps": true,
-          "category": "pulls",
-          "subcategory": "pulls"
-        }
-      },
-      "delete": {
-        "summary": "Unarchive a pull request",
-        "description": "Unarchives a pull request. Removes the archived flag from the pull request.\nDoes not automatically reopen or unlock the pull request.\nOnly repository admins can unarchive pull requests.",
-        "tags": [
-          "pulls"
-        ],
-        "operationId": "pulls/unarchive",
-        "externalDocs": {
-          "description": "API method documentation",
-          "url": "https://docs.github.com/rest/pulls/pulls#unarchive-a-pull-request"
-        },
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/owner"
-          },
-          {
-            "$ref": "#/components/parameters/repo"
-          },
-          {
-            "$ref": "#/components/parameters/pull-number"
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Response"
-          },
-          "403": {
-            "$ref": "#/components/responses/forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/not_found"
-          },
-          "422": {
-            "$ref": "#/components/responses/validation_failed"
-          }
-        },
-        "x-github": {
-          "githubCloudOnly": false,
-          "enabledForGitHubApps": true,
-          "category": "pulls",
-          "subcategory": "pulls"
-        }
-      }
-    },
     "/repos/{owner}/{repo}/pulls/{pull_number}/codespaces": {
       "post": {
         "summary": "Create a codespace from a pull request",
@@ -74618,7 +74831,8 @@
                           "or_boolean_not_supported",
                           "no_accessible_repos",
                           "server_error",
-                          "only_non_semantic_fields_requested"
+                          "only_non_semantic_fields_requested",
+                          "service_unavailable"
                         ]
                       }
                     }
@@ -118343,7 +118557,7 @@
       },
       "issue-type": {
         "title": "Issue Type",
-        "description": "The type of issue.",
+        "description": "The type assigned to the issue. This is only present for issues in repositories where issue types are supported.",
         "type": "object",
         "nullable": true,
         "properties": {
@@ -131868,128 +132082,6 @@
           }
         }
       },
-      "repository-rule-file-path-restriction": {
-        "title": "file_path_restriction",
-        "description": "Prevent commits that include changes in specified file and folder paths from being pushed to the commit graph. This includes absolute paths that contain file names.",
-        "type": "object",
-        "required": [
-          "type"
-        ],
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "file_path_restriction"
-            ]
-          },
-          "parameters": {
-            "type": "object",
-            "properties": {
-              "restricted_file_paths": {
-                "type": "array",
-                "description": "The file paths that are restricted from being pushed to the commit graph.",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "required": [
-              "restricted_file_paths"
-            ]
-          }
-        }
-      },
-      "repository-rule-max-file-path-length": {
-        "title": "max_file_path_length",
-        "description": "Prevent commits that include file paths that exceed the specified character limit from being pushed to the commit graph.",
-        "type": "object",
-        "required": [
-          "type"
-        ],
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "max_file_path_length"
-            ]
-          },
-          "parameters": {
-            "type": "object",
-            "properties": {
-              "max_file_path_length": {
-                "type": "integer",
-                "description": "The maximum amount of characters allowed in file paths.",
-                "minimum": 1,
-                "maximum": 32767
-              }
-            },
-            "required": [
-              "max_file_path_length"
-            ]
-          }
-        }
-      },
-      "repository-rule-file-extension-restriction": {
-        "title": "file_extension_restriction",
-        "description": "Prevent commits that include files with specified file extensions from being pushed to the commit graph.",
-        "type": "object",
-        "required": [
-          "type"
-        ],
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "file_extension_restriction"
-            ]
-          },
-          "parameters": {
-            "type": "object",
-            "properties": {
-              "restricted_file_extensions": {
-                "type": "array",
-                "description": "The file extensions that are restricted from being pushed to the commit graph.",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "required": [
-              "restricted_file_extensions"
-            ]
-          }
-        }
-      },
-      "repository-rule-max-file-size": {
-        "title": "max_file_size",
-        "description": "Prevent commits with individual files that exceed the specified limit from being pushed to the commit graph.",
-        "type": "object",
-        "required": [
-          "type"
-        ],
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "max_file_size"
-            ]
-          },
-          "parameters": {
-            "type": "object",
-            "properties": {
-              "max_file_size": {
-                "type": "integer",
-                "description": "The maximum file size allowed in megabytes. This limit does not apply to Git Large File Storage (Git LFS).",
-                "minimum": 1,
-                "maximum": 100
-              }
-            },
-            "required": [
-              "max_file_size"
-            ]
-          }
-        }
-      },
       "repository-rule-params-restricted-commits": {
         "title": "RestrictedCommits",
         "description": "Restricted commit",
@@ -132167,6 +132259,128 @@
           }
         }
       },
+      "repository-rule-file-path-restriction": {
+        "title": "file_path_restriction",
+        "description": "Prevent commits that include changes in specified file and folder paths from being pushed to the commit graph. This includes absolute paths that contain file names.",
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "file_path_restriction"
+            ]
+          },
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "restricted_file_paths": {
+                "type": "array",
+                "description": "The file paths that are restricted from being pushed to the commit graph.",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "restricted_file_paths"
+            ]
+          }
+        }
+      },
+      "repository-rule-max-file-path-length": {
+        "title": "max_file_path_length",
+        "description": "Prevent commits that include file paths that exceed the specified character limit from being pushed to the commit graph.",
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "max_file_path_length"
+            ]
+          },
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "max_file_path_length": {
+                "type": "integer",
+                "description": "The maximum amount of characters allowed in file paths.",
+                "minimum": 1,
+                "maximum": 32767
+              }
+            },
+            "required": [
+              "max_file_path_length"
+            ]
+          }
+        }
+      },
+      "repository-rule-file-extension-restriction": {
+        "title": "file_extension_restriction",
+        "description": "Prevent commits that include files with specified file extensions from being pushed to the commit graph.",
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "file_extension_restriction"
+            ]
+          },
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "restricted_file_extensions": {
+                "type": "array",
+                "description": "The file extensions that are restricted from being pushed to the commit graph.",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "restricted_file_extensions"
+            ]
+          }
+        }
+      },
+      "repository-rule-max-file-size": {
+        "title": "max_file_size",
+        "description": "Prevent commits with individual files that exceed the specified limit from being pushed to the commit graph.",
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "max_file_size"
+            ]
+          },
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "max_file_size": {
+                "type": "integer",
+                "description": "The maximum file size allowed in megabytes. This limit does not apply to Git Large File Storage (Git LFS).",
+                "minimum": 1,
+                "maximum": 100
+              }
+            },
+            "required": [
+              "max_file_size"
+            ]
+          }
+        }
+      },
       "repository-rule": {
         "title": "Repository Rule",
         "type": "object",
@@ -132218,6 +132432,15 @@
             "$ref": "#/components/schemas/repository-rule-tag-name-pattern"
           },
           {
+            "$ref": "#/components/schemas/repository-rule-workflows"
+          },
+          {
+            "$ref": "#/components/schemas/repository-rule-code-scanning"
+          },
+          {
+            "$ref": "#/components/schemas/repository-rule-copilot-code-review"
+          },
+          {
             "$ref": "#/components/schemas/repository-rule-file-path-restriction"
           },
           {
@@ -132228,15 +132451,6 @@
           },
           {
             "$ref": "#/components/schemas/repository-rule-max-file-size"
-          },
-          {
-            "$ref": "#/components/schemas/repository-rule-workflows"
-          },
-          {
-            "$ref": "#/components/schemas/repository-rule-code-scanning"
-          },
-          {
-            "$ref": "#/components/schemas/repository-rule-copilot-code-review"
           }
         ]
       },
@@ -147642,6 +147856,36 @@
           {
             "allOf": [
               {
+                "$ref": "#/components/schemas/repository-rule-workflows"
+              },
+              {
+                "$ref": "#/components/schemas/repository-rule-ruleset-info"
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/repository-rule-code-scanning"
+              },
+              {
+                "$ref": "#/components/schemas/repository-rule-ruleset-info"
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/repository-rule-copilot-code-review"
+              },
+              {
+                "$ref": "#/components/schemas/repository-rule-ruleset-info"
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
                 "$ref": "#/components/schemas/repository-rule-file-path-restriction"
               },
               {
@@ -147673,36 +147917,6 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/repository-rule-max-file-size"
-              },
-              {
-                "$ref": "#/components/schemas/repository-rule-ruleset-info"
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/repository-rule-workflows"
-              },
-              {
-                "$ref": "#/components/schemas/repository-rule-ruleset-info"
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/repository-rule-code-scanning"
-              },
-              {
-                "$ref": "#/components/schemas/repository-rule-ruleset-info"
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/repository-rule-copilot-code-review"
               },
               {
                 "$ref": "#/components/schemas/repository-rule-ruleset-info"
@@ -325576,6 +325790,16 @@
               "node_id": "MDU6SXNzdWUzNTgwMg==",
               "number": 132,
               "title": "Line Number Indexes Beyond 20 Not Displayed",
+              "type": {
+                "id": 1,
+                "node_id": "IT_kwDNJr9H",
+                "name": "Bug",
+                "description": "An unexpected problem or behavior",
+                "color": "red",
+                "created_at": "2023-10-09T13:30:49Z",
+                "updated_at": "2024-05-30T18:20:53Z",
+                "is_enabled": true
+              },
               "user": {
                 "login": "Nick3C",
                 "id": 90254,

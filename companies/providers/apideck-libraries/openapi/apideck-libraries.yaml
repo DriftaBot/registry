@@ -21607,6 +21607,13 @@ paths:
         - connector: xero
           description: |
             Xero supports creating payments against multiple allocation types in a single request. However, the response will provide the ID of the first payment only. To access all payment IDs, inspect the raw data.
+
+            Xero rejects payments where the organisation base currency, the invoice currency, and the bank
+            account currency are all different (a "3-currency transaction"):
+
+            `"The invoice, payment and organisation base currencies are all different. Xero cannot currently handle a 3-currency transaction."`
+
+            Pay from a bank account in either the base or the invoice currency (two currencies) to avoid the error.
         - connector: quickbooks
           description: |
             Payment allocations in QuickBooks are processed asynchronously. While the allocations are included in the request, they may not appear in the immediate response. The allocations will be applied and become visible in subsequent list or get calls.
@@ -25591,6 +25598,14 @@ paths:
         - connector: netsuite
           description: |
             In order to read or write the `status` field, you must enable Approval Routing for Vendor Payments in Netsuite. Navigate to Setup > Accounting Preferences > Approval Routing > Vendor Payments > Approval Routing.
+        - connector: xero
+          description: |
+            Xero rejects bill payments where the organisation base currency, the bill currency, and the
+            bank account currency are all different (a "3-currency transaction"):
+
+            `"The invoice, payment and organisation base currencies are all different. Xero cannot currently handle a 3-currency transaction."`
+
+            Pay from a bank account in either the base or the bill currency (two currencies) to avoid the error.
       requestBody:
         required: true
         content:
@@ -28574,6 +28589,34 @@ paths:
         - $ref: '#/components/parameters/serviceId'
       security:
         - apiKey: []
+      x-apideck-gotchas:
+        - connector: netsuite
+          description: |
+            When creating expense report line items, the `line_items[].account.id` field is not written to NetSuite.
+            In NetSuite, the GL account is automatically derived from the expense category. Setting `line_items[].account.id`
+            has no effect and may trigger an INSUFFICIENT_PERMISSION error in strict tenant configurations.
+            Use `line_items[].expense_category.id` to specify the category (which implicitly sets the GL account).
+
+            The `line_items[].reimbursable` field maps to the NetSuite `corporateCreditCard` boolean on each expense line.
+            Setting `reimbursable: false` sets `corporateCreditCard: true`, marking the line as a corporate card expense.
+            NetSuite will automatically create an offsetting accounting entry against the corporate card liability account,
+            and the line's amount will not count toward the employee reimbursement total (resulting in `total_amount: 0`
+            if all lines are non-reimbursable). Setting `reimbursable: true` (or omitting the field) leaves
+            `corporateCreditCard` unset, meaning the employee is expected to be reimbursed out-of-pocket.
+
+            The employee record linked to the expense report must have a corporate credit card configured in NetSuite
+            when `reimbursable: false` is used, otherwise the API will return a validation error.
+
+            Note: `corporateCreditCard` is the current NetSuite SOAP field for this purpose. The legacy
+            `isNonReimbursable` field was removed in NetSuite 18.2 for accounts that did not use it prior to that version.
+
+            Important read limitation: The list endpoint (`GET /expense-reports`) reads `line_items[].reimbursable`
+            from the NetSuite SuiteQL `transactionline` table, which exposes only the legacy `isNonReimbursable` column.
+            Because writing `reimbursable: false` sets `corporateCreditCard` (not `isNonReimbursable`), the list
+            endpoint will always return `reimbursable: true` for lines created with `reimbursable: false` via this API.
+            To get accurate `reimbursable` values for corporate card lines, use the single record endpoint
+            (`GET /expense-reports/{id}`), which reads directly from the NetSuite SOAP API where `corporateCreditCard`
+            is available.
       requestBody:
         required: true
         content:
@@ -28759,6 +28802,34 @@ paths:
         - $ref: '#/components/parameters/raw'
       security:
         - apiKey: []
+      x-apideck-gotchas:
+        - connector: netsuite
+          description: |
+            When updating expense report line items, the `line_items[].account.id` field is not written to NetSuite.
+            In NetSuite, the GL account is automatically derived from the expense category. Setting `line_items[].account.id`
+            has no effect and may trigger an INSUFFICIENT_PERMISSION error in strict tenant configurations.
+            Use `line_items[].expense_category.id` to specify the category (which implicitly sets the GL account).
+
+            The `line_items[].reimbursable` field maps to the NetSuite `corporateCreditCard` boolean on each expense line.
+            Setting `reimbursable: false` sets `corporateCreditCard: true`, marking the line as a corporate card expense.
+            NetSuite will automatically create an offsetting accounting entry against the corporate card liability account,
+            and the line's amount will not count toward the employee reimbursement total (resulting in `total_amount: 0`
+            if all lines are non-reimbursable). Setting `reimbursable: true` (or omitting the field) leaves
+            `corporateCreditCard` unset, meaning the employee is expected to be reimbursed out-of-pocket.
+
+            The employee record linked to the expense report must have a corporate credit card configured in NetSuite
+            when `reimbursable: false` is used, otherwise the API will return a validation error.
+
+            Note: `corporateCreditCard` is the current NetSuite SOAP field for this purpose. The legacy
+            `isNonReimbursable` field was removed in NetSuite 18.2 for accounts that did not use it prior to that version.
+
+            Important read limitation: The list endpoint (`GET /expense-reports`) reads `line_items[].reimbursable`
+            from the NetSuite SuiteQL `transactionline` table, which exposes only the legacy `isNonReimbursable` column.
+            Because writing `reimbursable: false` sets `corporateCreditCard` (not `isNonReimbursable`), the list
+            endpoint will always return `reimbursable: true` for lines created with `reimbursable: false` via this API.
+            To get accurate `reimbursable` values for corporate card lines, use the single record endpoint
+            (`GET /expense-reports/{id}`), which reads directly from the NetSuite SOAP API where `corporateCreditCard`
+            is available.
       requestBody:
         required: true
         content:

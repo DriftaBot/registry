@@ -49420,6 +49420,148 @@
         }
       }
     },
+    "/repos/{owner}/{repo}/code-quality/setup": {
+      "get": {
+        "summary": "Get a code quality setup configuration",
+        "description": "Gets a code quality setup configuration.\n\nOAuth app tokens and personal access tokens (classic) need the `repo` scope to use this endpoint with private or public repositories, or the `public_repo` scope to use this endpoint with only public repositories.",
+        "tags": [
+          "code-quality"
+        ],
+        "operationId": "code-quality/get-setup",
+        "externalDocs": {
+          "description": "API method documentation",
+          "url": "https://docs.github.com/rest/code-quality/code-quality#get-a-code-quality-setup-configuration"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/owner"
+          },
+          {
+            "$ref": "#/components/parameters/repo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/code-quality-setup"
+                },
+                "examples": {
+                  "default": {
+                    "$ref": "#/components/examples/code-quality-setup"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/code_quality_forbidden_read"
+          },
+          "404": {
+            "$ref": "#/components/responses/not_found"
+          },
+          "503": {
+            "$ref": "#/components/responses/service_unavailable"
+          }
+        },
+        "x-github": {
+          "githubCloudOnly": false,
+          "enabledForGitHubApps": true,
+          "category": "code-quality",
+          "subcategory": "code-quality"
+        }
+      },
+      "patch": {
+        "summary": "Update a code quality setup configuration",
+        "description": "Updates a code quality setup configuration.\n\nOAuth app tokens and personal access tokens (classic) need the `repo` scope to use this endpoint with private or public repositories, or the `public_repo` scope to use this endpoint with only public repositories.",
+        "tags": [
+          "code-quality"
+        ],
+        "operationId": "code-quality/update-setup",
+        "externalDocs": {
+          "description": "API method documentation",
+          "url": "https://docs.github.com/rest/code-quality/code-quality#update-a-code-quality-setup-configuration"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/owner"
+          },
+          {
+            "$ref": "#/components/parameters/repo"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/code-quality-setup-update"
+              },
+              "examples": {
+                "default": {
+                  "$ref": "#/components/examples/code-quality-setup-update"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/empty-object"
+                },
+                "examples": {
+                  "default": {
+                    "value": null
+                  }
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/code-quality-setup-update-response"
+                },
+                "examples": {
+                  "default": {
+                    "$ref": "#/components/examples/code-quality-setup-update-response"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/code_quality_forbidden_write"
+          },
+          "404": {
+            "$ref": "#/components/responses/not_found"
+          },
+          "409": {
+            "$ref": "#/components/responses/code_quality_conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/code_quality_invalid_state"
+          },
+          "503": {
+            "$ref": "#/components/responses/service_unavailable"
+          }
+        },
+        "x-github": {
+          "githubCloudOnly": false,
+          "enabledForGitHubApps": true,
+          "category": "code-quality",
+          "subcategory": "code-quality"
+        }
+      }
+    },
     "/repos/{owner}/{repo}/code-scanning/alerts": {
       "get": {
         "summary": "List code scanning alerts for a repository",
@@ -138847,6 +138989,146 @@
           },
           "repository": {
             "$ref": "#/components/schemas/minimal-repository"
+          }
+        }
+      },
+      "code-quality-setup": {
+        "description": "Configuration for code quality setup.",
+        "type": "object",
+        "properties": {
+          "state": {
+            "description": "Code quality setup has been configured or not.",
+            "type": "string",
+            "enum": [
+              "configured",
+              "not-configured"
+            ]
+          },
+          "languages": {
+            "description": "Languages to be analyzed.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "csharp",
+                "go",
+                "java-kotlin",
+                "javascript-typescript",
+                "python",
+                "ruby",
+                "rust"
+              ]
+            }
+          },
+          "runner_type": {
+            "description": "Runner type to be used.",
+            "nullable": true,
+            "type": "string",
+            "enum": [
+              "standard",
+              "labeled"
+            ]
+          },
+          "runner_label": {
+            "description": "Runner label to be used if the runner type is labeled.",
+            "nullable": true,
+            "type": "string",
+            "example": "code-scanning"
+          },
+          "updated_at": {
+            "description": "Timestamp of latest configuration update.",
+            "nullable": true,
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-12-06T14:20:20.000Z"
+          },
+          "schedule": {
+            "description": "The frequency of the periodic analysis.",
+            "nullable": true,
+            "type": "string",
+            "enum": [
+              "weekly"
+            ]
+          }
+        }
+      },
+      "code-quality-setup-update": {
+        "description": "Configuration for code quality setup.",
+        "type": "object",
+        "properties": {
+          "state": {
+            "description": "The desired state of code quality setup.",
+            "type": "string",
+            "enum": [
+              "configured",
+              "not-configured"
+            ]
+          },
+          "runner_type": {
+            "description": "Runner type to be used.",
+            "type": "string",
+            "enum": [
+              "standard",
+              "labeled"
+            ]
+          },
+          "runner_label": {
+            "nullable": true,
+            "description": "Runner label to be used if the runner type is labeled.",
+            "type": "string",
+            "example": "code-scanning"
+          },
+          "languages": {
+            "description": "Languages to be analyzed.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "csharp",
+                "go",
+                "java-kotlin",
+                "javascript-typescript",
+                "python",
+                "ruby"
+              ]
+            }
+          }
+        },
+        "anyOf": [
+          {
+            "required": [
+              "state"
+            ]
+          },
+          {
+            "required": [
+              "runner_type"
+            ]
+          },
+          {
+            "required": [
+              "runner_label"
+            ]
+          },
+          {
+            "required": [
+              "languages"
+            ]
+          }
+        ],
+        "additionalProperties": false
+      },
+      "code-quality-setup-update-response": {
+        "description": "You can use `run_url` to track the status of the run. This includes a property status and conclusion.\nYou should not rely on this always being an actions workflow run object.",
+        "type": "object",
+        "properties": {
+          "run_id": {
+            "description": "ID of the corresponding run.",
+            "type": "integer"
+          },
+          "run_url": {
+            "description": "URL of the corresponding run.",
+            "type": "string"
           }
         }
       },
@@ -314117,6 +314399,35 @@
           ]
         }
       },
+      "code-quality-setup": {
+        "value": {
+          "state": "configured",
+          "languages": [
+            "javascript-typescript",
+            "python"
+          ],
+          "runner_type": "standard",
+          "runner_label": null,
+          "updated_at": "2023-01-01T00:00:00Z",
+          "schedule": "weekly"
+        }
+      },
+      "code-quality-setup-update": {
+        "value": {
+          "state": "configured",
+          "languages": [
+            "javascript-typescript",
+            "python",
+            "ruby"
+          ]
+        }
+      },
+      "code-quality-setup-update-response": {
+        "value": {
+          "run_id": 42,
+          "run_url": "https://api.github.com/repos/octocat/hello-world/actions/runs/42"
+        }
+      },
       "code-scanning-alert-items": {
         "value": [
           {
@@ -333320,6 +333631,46 @@
       },
       "gone": {
         "description": "Gone",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/basic-error"
+            }
+          }
+        }
+      },
+      "code_quality_forbidden_read": {
+        "description": "Response if the user is not authorized to access Code quality for this repository.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/basic-error"
+            }
+          }
+        }
+      },
+      "code_quality_forbidden_write": {
+        "description": "Response if the repository is archived or if Code quality is not enabled for this repository",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/basic-error"
+            }
+          }
+        }
+      },
+      "code_quality_conflict": {
+        "description": "Response if there is already a code quality setup configuration update in progress",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/basic-error"
+            }
+          }
+        }
+      },
+      "code_quality_invalid_state": {
+        "description": "Response if the configuration change cannot be made",
         "content": {
           "application/json": {
             "schema": {
